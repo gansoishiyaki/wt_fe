@@ -32,6 +32,7 @@ let Chara = {
   hyrein: {
     id: "hyrein",
     name: "ハイレイン",
+    role: "アフトクラトル遠征部隊隊長",
     type: 1,
     maxhp: 80,
     atk: 28,
@@ -46,6 +47,7 @@ let Chara = {
   hyuse: {
     id: "hyuse",
     name: "ヒュース",
+    role: "ハイレイン隊",
     type: 1,
     maxhp: 42,
     atk: 23,

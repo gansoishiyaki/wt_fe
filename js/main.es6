@@ -4,20 +4,21 @@ enchant();
 window.onload = () => {
   window.game = new Game(WINDOW.width, WINDOW.height);
   previewCenter(game);
-  game.fps = 20;
+  game.fps = FPS;
 
   window.scenes = {};
 
   preload();
   game.onload = () => {
     // map表示
-    //set_map(Maps.test);
-    scenes.map = new FMap(Maps.test);
+    scenes.map = new MapScene(Maps.test);
+    scenes.status = new StatusScene();
     game.pushScene(scenes.map);
   };
 
   game.start();
 
+  // preloadをまとめて行う
   function preload() {
     // system
     game.preload(
@@ -41,6 +42,7 @@ window.onload = () => {
     }
   };
 
+  // キャラクターのpreload
   function preload_chara(chara) {
     game.preload(`img/chara/map/${chara.id}.png`);
     game.preload(`img/chara/status/${chara.id}.png`);

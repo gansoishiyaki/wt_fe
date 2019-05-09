@@ -1,11 +1,19 @@
-var Charactor = enchant.Class.create(enchant.Group, {
+//////////////////////////////
+// MapCharactor Mapに表示するキャラクター
+// 攻撃範囲計算などを行う
+//////////////////////////////
+
+var MapCharactor = enchant.Class.create(enchant.Group, {
   is_enemy: false,
   hp: 0,
   maxhp: 0,
+  is_touch: false,
+  is_move: false,
 
   initialize: function(data, is_enemy = false) {
     enchant.Group.call(this);
     
+    // init status
     this.data = data;
     this.maxhp = data.maxhp;
     this.hp = this.maxhp;
@@ -19,23 +27,41 @@ var Charactor = enchant.Class.create(enchant.Group, {
     this.main.image = game.assets[`img/chara/map/${data.id}.png`];
     this.addChild(this.main);
 
+    // キャラクター下部のHP表示
     this.gage = new MiniGage(this);
     this.addChild(this.gage);
     
     this.main.on(Event.TOUCH_START, e => {
-      touchstart = (new Date()).getTime();
+      this.is_touch = true;
+
+      // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
+      this.tl.delay(FPS / 2).then(function(){
+        if (!this.is_touch || this.is_move) {return;}
+
+        //
+        console.log("long_touch");
+        this.is_touch = false;
+
+        // キャラクターステータス表示
+        scenes.status.setChara(this);
+      });
     });
 
     this.main.on(Event.TOUCH_END, e => {
-      let timerange = (new Date()).getTime() - touchstart;
-      if(timerange >= 1000) {
-        console.log("longtouch", this);
+      // touch開始していない場合は終了
+      if (!this.is_touch) {return}
+      this.is_touch = false;
+
+      if (this.is_move) {
+        // キャラクターの移動
       } else {
-        scenes.map.set_chara(this);
+        // キャラクターのシングルタップ動作
+        scenes.map.touchedChara(this);
       }
     });
   },
 
+  // キャラクターの位置設定
   setPos: function(x, y) {
     this.pos.x = x;
     this.pos.y = y;
@@ -110,7 +136,7 @@ var Charactor = enchant.Class.create(enchant.Group, {
         if (x >= MAP.width || y >= MAP.height) {return;}
         
         // 移動範囲に入っていない場合
-        if (moves[y][x] == 99 && attacks[y][x] == 99 && !scenes.map.hitCol(x, y)) {
+        if (moves[y][x] == 99 && attacks[y][x] == 99) {
           attacks[y][x] = 1;
           return attack_range.push({x: x, y: y});
         }

@@ -29,3 +29,5 @@ let DIRECTIONS = [
   {x: 0, y: 1},
   {x: 1, y: 0}
 ];
+
+let FPS = 20;

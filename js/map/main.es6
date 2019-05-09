@@ -1,4 +1,5 @@
-var FMap = enchant.Class.create(enchant.Scene, {
+// 名前空間を作成
+var MapScene = enchant.Class.create(enchant.Scene, {
   initialize: function(data) {
     enchant.Scene.call(this);
 
@@ -28,44 +29,52 @@ var FMap = enchant.Class.create(enchant.Scene, {
     this.menu.image = game.assets['img/system/mini_status.png'];
     this.menu.y = CHIP_SIZE * 9.5;
     this.menu.scale(1, 0.5);
-    this.addChild(this.menu);
+    this.addChild(this.menu)
 
     // 敵の表示
     this.enemies = data.enemies.map(enemy => {
-      var chara = new Charactor(enemy.chara, true);
+      var chara = new MapCharactor(enemy.chara, true);
       chara.setPos(enemy.x, enemy.y);
       this.field.addChild(chara);
       return chara;
     });
 
     this.players = data.players.map((player, i) => {
-      var chara = new Charactor(party[i]);
+      var chara = new MapCharactor(party[i]);
       chara.setPos(player.x, player.y);
       this.field.addChild(chara);
       return chara;
     });
   },
 
-  set_chara: function(chara) {
+  // キャラクターシングルタップ
+  touchedChara: function(chara) {
     this.status.set_chara(chara);
-    let moves = this.calRange(chara);
-    let attacks = chara.calAttackRange(moves);
+
+    // 移動範囲計算
+    let moves = this.calRange(chara.pos, chara.getMove());
+
+    // 移動範囲から攻撃範囲を計算し、障害物を取り除く
+    var attacks = chara.calAttackRange(moves);
+    attacks = attacks.filter(pos => !this.hitCol(pos.x, pos.y));
+
+    // 範囲表示
     this.ranges.set_ranges(moves, attacks);
   },
 
   // 移動範囲計算
-  calRange: function(chara) {
-    chara.range.moves = [];
-    chara.range.attacks = [];
+  calRange: function(pos, move) {
+    var move_range = [];
 
-    // 0のマップ分の配列を作成する
+    // マップ分の配列を作成する
     var moves = Common.getEmptyArray();
+    moves[pos.y][pos.x] = 0;
 
-    moves[chara.pos.y][chara.pos.x] = 0;
-    var poss = [[{x: chara.pos.x, y: chara.pos.y}]];
-    chara.range.moves.push({x: chara.pos.x, y: chara.pos.y});
+    // poss = 距離ごとに到達領域を保存する
+    var poss = [[{x: pos.x, y: pos.y}]];
+    move_range.push({x: pos.x, y: pos.y});
 
-    [...Array(chara.getMove())].forEach((e, i) => {
+    [...Array(move)].forEach((e, i) => {
       poss[i + 1] = [];
       poss[i].forEach(pos => {
         // 指定位置から四方向
@@ -82,13 +91,13 @@ var FMap = enchant.Class.create(enchant.Scene, {
             // 最短距離にする
             moves[y][x] = i + 1;
             poss[i + 1].push({x: x, y: y});
-            chara.range.moves.push({x: x, y: y});
+            move_range.push({x: x, y: y});
           }
         });
       });
     });
 
-    return chara.range.moves;
+    return move_range;
   },
 
   // 衝突チェック
