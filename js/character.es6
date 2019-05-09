@@ -28,7 +28,7 @@ var Charactor = enchant.Class.create(enchant.Group, {
 
     this.main.on(Event.TOUCH_END, e => {
       let timerange = (new Date()).getTime() - touchstart;
-      if(timerange >= 500) {
+      if(timerange >= 1000) {
         console.log("longtouch", this);
       } else {
         scenes.map.set_chara(this);
@@ -50,6 +50,41 @@ var Charactor = enchant.Class.create(enchant.Group, {
   getColor: function() {
     return this.is_enemy ? COLOR.enemy : COLOR.player;
   },
+
+  trigger: function() {
+    return this.data.main_trigger;
+  },
+
+  trigger_range: function() {
+    return this.trigger().range;
+  },
+
+  cal_trigger_range: function() {
+
+  },
+
+  calAttackRange: function(range) {
+    var attacks = [...Array(MAP.height)].map(i => {
+      return [...Array(MAP.width)].map(i => 99);
+    });
+
+    range.forEach(pos => {
+      this.trigger_range().forEach(d => {
+        let x = pos.x + d.x;
+        let y = pos.y + d.y;
+
+        // マイナスは処理しない
+        if (x < 0 || y < 0) { return; }
+        if (x >= MAP.width || y >= MAP.height) {return;}
+        
+        // 移動範囲に入っていない場合
+        if (moves[y][x] == 99 && attacks[y][x] == 99 && !this.hitCol(x, y)) {
+          attacks[y][x] = 1;
+          chara.range.attacks.push({x: x, y: y});
+        }
+      });
+    });
+  },
 });
 
 var MiniGage = enchant.Class.create(enchant.Group, {
@@ -59,22 +94,18 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     enchant.Group.call(this);
     this.chara = chara;
     this.y = CHIP_SIZE - this.fontsize;
-
-    // hp
     this.hp = this.chara.hp;
-    this.hp_sprite = new FLabel(`${this.hp}`, this.fontsize, 0, 0);
-    this.hp_sprite.main.color = this.chara.getColor();
-    this.hp_sprite.setShadow();
-    this.addChild(this.hp_sprite);
 
+    // gage
     let gage_width = CHIP_SIZE - this.fontsize;
     let gage_height = 6;
     let line = 1;
 
     this.gage = new Group();
-    this.gage.x = this.fontsize;
+    this.gage.x = this.fontsize - 2;
     this.gage.y = 4;
 
+    // gageの枠
     this.gage.base = new Sprite(gage_width, gage_height);
     let base_sur = new Surface(gage_width, gage_height);
     base_sur.context.fillStyle = "#222222";
@@ -82,6 +113,7 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     this.gage.base.image = base_sur;
     this.gage.addChild(this.gage.base);
 
+    // gageの中身
     let main_width = this.hp / this.chara.maxhp * (gage_width - line * 2);
     let main_height = gage_height - line * 2;
     this.gage.main = new Sprite(main_width, main_height);
@@ -94,15 +126,18 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     var grad = main_sur.context.createLinearGradient(0, 0, 0, main_height);
     grad.addColorStop(0, 'white'); 
     grad.addColorStop(1, this.chara.getColor()); 
-
     main_sur.context.fillStyle = grad; 
-    //main_sur.context.fillStyle = this.chara.getColor();
     main_sur.context.fillRect(0, 0, main_width, main_height);
 
     this.gage.main.image = main_sur;
-
     this.gage.addChild(this.gage.main);
 
     this.addChild(this.gage);
+
+    // hp
+    this.hp_sprite = new FLabel(`${this.hp}`, this.fontsize, 0, 0);
+    this.hp_sprite.main.color = this.chara.getColor();
+    this.hp_sprite.setShadow();
+    this.addChild(this.hp_sprite);
   },
 });

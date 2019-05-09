@@ -1,3 +1,8 @@
+let RangeType = {
+  normal: 0,
+  line: 1
+}
+
 let Skill = {
   alektor: {
     id: "alektor",
@@ -7,7 +12,8 @@ let Skill = {
     hit: 60,
     is_black: true,
     description: "与えたダメージを吸収する。<br>※ハイレイン専用",
-    range: RANGE.range_2
+    range: 2,
+    type: RangeType.normal
   },
   lambillis: {
     id: "lambillis",
@@ -17,7 +23,8 @@ let Skill = {
     hit: 70,
     is_black: false,
     description: "攻撃後、敵を自分の隣に隣接させる。<br>※ヒュース専用",
-    range: RANGE.range_2
+    range: 2,
+    type: RangeType.normal
   }
 }
 
