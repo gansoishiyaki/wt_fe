@@ -92,10 +92,15 @@ var Charactor = enchant.Class.create(enchant.Group, {
   calRangeLine: function() {
   },
 
-  calAttackRange: function(moves) {
-    var attacks = Common.getEmptyArray();
+  calAttackRange: function(move_range) {
+    // moves[y][x]で取り出せる元の配列を作成する
+    var moves = Common.getEmptyArray();
+    move_range.forEach(pos => { moves[pos.y][pos.x] = 0;});
 
-    moves.forEach(pos => {
+    var attacks = Common.getEmptyArray();
+    var attack_range = [];
+
+    move_range.forEach(pos => {
       this.calTriggerRange().forEach(d => {
         let x = pos.x + d.x;
         let y = pos.y + d.y;
@@ -105,12 +110,14 @@ var Charactor = enchant.Class.create(enchant.Group, {
         if (x >= MAP.width || y >= MAP.height) {return;}
         
         // 移動範囲に入っていない場合
-        if (moves[y][x] == 99 && attacks[y][x] == 99 && !this.hitCol(x, y)) {
+        if (moves[y][x] == 99 && attacks[y][x] == 99 && !scenes.map.hitCol(x, y)) {
           attacks[y][x] = 1;
-          chara.range.attacks.push({x: x, y: y});
+          return attack_range.push({x: x, y: y});
         }
       });
     });
+
+    return attack_range; 
   },
 });
 

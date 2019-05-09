@@ -48,8 +48,9 @@ var FMap = enchant.Class.create(enchant.Scene, {
 
   set_chara: function(chara) {
     this.status.set_chara(chara);
-    this.calRange(chara);
-    this.ranges.set_ranges(chara);
+    let moves = this.calRange(chara);
+    let attacks = chara.calAttackRange(moves);
+    this.ranges.set_ranges(moves, attacks);
   },
 
   // 移動範囲計算
@@ -87,26 +88,7 @@ var FMap = enchant.Class.create(enchant.Scene, {
       });
     });
 
-    var attacks = [...Array(MAP.height)].map(i => {
-      return [...Array(MAP.width)].map(i => 99);
-    });
-
-    chara.range.moves.forEach(pos => {
-      chara.calTriggerRange().forEach(d => {
-        let x = pos.x + d.x;
-        let y = pos.y + d.y;
-
-        // マイナスは処理しない
-        if (x < 0 || y < 0) { return; }
-        if (x >= MAP.width || y >= MAP.height) {return;}
-        
-        // 移動範囲に入っていない場合
-        if (moves[y][x] == 99 && attacks[y][x] == 99 && !this.hitCol(x, y)) {
-          attacks[y][x] = 1;
-          chara.range.attacks.push({x: x, y: y});
-        }
-      });
-    });
+    return chara.range.moves;
   },
 
   // 衝突チェック
@@ -122,11 +104,11 @@ var Range = enchant.Class.create(enchant.Group, {
     enchant.Group.call(this);
   },
 
-  set_ranges: function(chara) {
+  set_ranges: function(moves = [], attacks = []) {
     this.removeAll();
 
-    chara.range.moves.forEach(pos => this.drawPos(pos.x, pos.y));
-    chara.range.attacks.forEach(pos => this.drawPos(pos.x, pos.y, COLOR.attack));
+    moves.forEach(pos => this.drawPos(pos.x, pos.y));
+    attacks.forEach(pos => this.drawPos(pos.x, pos.y, COLOR.attack));
   },
 
   drawPos: function(x, y, color = COLOR.move) {
