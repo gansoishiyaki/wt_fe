@@ -2,10 +2,10 @@ let MapStatus = {
   test: {
     file: "map",
     type: [{
-      col: true,
+      hit: false,
     },
     {
-      col: false
+      hit: true
     }],
   }
 };

@@ -13,7 +13,9 @@ let WINDOW = {
 
 let COLOR = {
   move: "#2222ff",
-  attack: "#ff4500"
+  attack: "#ff4500",
+  player: "#00ff7f",
+  enemy: "#ff6347"
 };
 
 let RangeType = {
@@ -25,11 +27,11 @@ let party = [Chara.hyuse];
 
 enchant();
 window.onload = () => {
-  let game = new Game(WINDOW.width, WINDOW.height);
+  window.game = new Game(WINDOW.width, WINDOW.height);
   previewCenter(game);
   game.fps = 20;
 
-  let scenes = {};
+  window.scenes = {};
   var playing_map;
   var selected_chara;
   var move_flag = false;
@@ -79,9 +81,8 @@ window.onload = () => {
 
       // 敵の表示
       this.enemies = data.enemies.map(enemy => {
-        var chara = new Charactor(enemy.chara);
+        var chara = new Charactor(enemy.chara, true);
         chara.setPos(enemy.x, enemy.y);
-        chara.is_enemy = true;
         this.field.addChild(chara);
         return chara;
       });
@@ -197,50 +198,6 @@ window.onload = () => {
     },
   });
 
-  var Charactor = enchant.Class.create(enchant.Group, {
-    is_enemy: false,
-    hp: 0,
-    maxhp: 0,
-
-    initialize: function(data) {
-      enchant.Group.call(this);
-      
-      this.data = data;
-      this.maxhp = data.maxhp;
-      this.hp = this.maxhp;
-      this.pos = {x: 0, y: 0};
-      this.range = {};
-      
-      // mainスプライト
-      this.main = new Sprite(CHIP_SIZE, CHIP_SIZE);
-      this.main.image = game.assets[`img/chara/map/${data.id}.png`];
-      this.addChild(this.main);
-      
-      this.main.on(Event.TOUCH_START, e => {
-        touchstart = (new Date()).getTime();
-      });
-
-      this.main.on(Event.TOUCH_END, e => {
-        let timerange = (new Date()).getTime() - touchstart;
-        if(timerange >= 500) {
-          console.log("longtouch", this);
-        } else {
-          scenes.map.set_chara(this);
-        }
-      });
-    },
-
-    setPos: function(x, y) {
-      this.pos.x = x;
-      this.pos.y = y;
-      this.x = CHIP_SIZE * x;
-      this.y = CHIP_SIZE * y;
-    },
-
-    getMove: function() {
-      return this.data.move;
-    }
-  });
 
   var MiniStatus = enchant.Class.create(enchant.Group, {
     margin: 5,
@@ -296,39 +253,6 @@ window.onload = () => {
       // スキル説明
       this.description = new FLabel(chara.data.main_trigger.description, 10, 60, status_y + 20);
       this.addChild(this.description);
-    },
-  });
-
-  var FLabel = enchant.Class.create(enchant.Group, {
-    initialize: function(str, fontsize, x, y) {
-      enchant.Group.call(this);
-      this.str = str;
-      this.x = x;
-      this.y = y;
-      this.fontsize = fontsize;
-
-      this.main = new Label(this.str);
-      this.main.font = `${this.fontsize}px PixelMplus10`;
-      this.main.color = "#ffffff"
-      this.addChild(this.main);
-    },
-
-    setShadow: function(color = "#000000"){
-      // 影表示
-      this.shadow = new Label(this.str);
-      this.shadow.font = `${this.fontsize}px PixelMplus10`;
-      this.shadow.color = color;
-      this.shadow.x = 1;
-      this.shadow.y = 1;
-
-      // 順番入れ替え
-      this.removeChild(this.main);
-      this.addChild(this.shadow);
-      this.addChild(this.main);
-    },
-
-    alignRight: function() {
-      this.x = this.x - this.main._boundWidth;
     },
   });
 
