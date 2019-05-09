@@ -7,10 +7,6 @@ window.onload = () => {
   game.fps = 20;
 
   window.scenes = {};
-  var playing_map;
-  var selected_chara;
-  var move_flag = false;
-  let touchstart = 0;
 
   preload();
   game.onload = () => {
