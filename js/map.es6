@@ -58,9 +58,7 @@ var FMap = enchant.Class.create(enchant.Scene, {
     chara.range.attacks = [];
 
     // 0のマップ分の配列を作成する
-    var moves = [...Array(MAP.height)].map(i => {
-      return [...Array(MAP.width)].map(i => 99);
-    });
+    var moves = Common.getEmptyArray();
 
     moves[chara.pos.y][chara.pos.x] = 0;
     var poss = [[{x: chara.pos.x, y: chara.pos.y}]];
@@ -94,7 +92,7 @@ var FMap = enchant.Class.create(enchant.Scene, {
     });
 
     chara.range.moves.forEach(pos => {
-      chara.data.main_trigger.range.forEach(d => {
+      chara.calTriggerRange().forEach(d => {
         let x = pos.x + d.x;
         let y = pos.y + d.y;
 

@@ -1,4 +1,4 @@
-let RangeType = {
+let TriggerRangeType = {
   normal: 0,
   line: 1
 }
@@ -13,7 +13,7 @@ let Skill = {
     is_black: true,
     description: "与えたダメージを吸収する。<br>※ハイレイン専用",
     range: 2,
-    type: RangeType.normal
+    type: TriggerRangeType.normal
   },
   lambillis: {
     id: "lambillis",
@@ -24,7 +24,7 @@ let Skill = {
     is_black: false,
     description: "攻撃後、敵を自分の隣に隣接させる。<br>※ヒュース専用",
     range: 2,
-    type: RangeType.normal
+    type: TriggerRangeType.normal
   }
 }
 

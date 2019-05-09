@@ -55,21 +55,48 @@ var Charactor = enchant.Class.create(enchant.Group, {
     return this.data.main_trigger;
   },
 
-  trigger_range: function() {
+  triggerRange: function() {
     return this.trigger().range;
   },
 
-  cal_trigger_range: function() {
-
+  // 中心を(0, 0)とした攻撃範囲
+  calTriggerRange: function() {
+    switch (this.trigger().type) {
+      case TriggerRangeType.normal:
+        return this.calRangeNormal();
+      case TriggerRangeType.line:
+        return this.calRangeLine();
+    }
   },
 
-  calAttackRange: function(range) {
-    var attacks = [...Array(MAP.height)].map(i => {
-      return [...Array(MAP.width)].map(i => 99);
+  // 通常の攻撃範囲
+  calRangeNormal: function() {
+    let tr = this.triggerRange();
+    let side_length = tr * 2 + 1;
+    
+    var range = [];
+    [...Array(side_length).keys()].forEach(y => {
+       [...Array(side_length).keys()].forEach(x => {
+        let pos = {x: x - tr, y: y - tr};
+        let abs = Math.abs(pos.x) + Math.abs(pos.y);
+        if (abs != 0 && abs <= tr) {
+          range.push({x: x - tr, y: y - tr});
+        }
+       });
     });
 
-    range.forEach(pos => {
-      this.trigger_range().forEach(d => {
+    return range;
+  },
+
+  // 直線上の攻撃範囲
+  calRangeLine: function() {
+  },
+
+  calAttackRange: function(moves) {
+    var attacks = Common.getEmptyArray();
+
+    moves.forEach(pos => {
+      this.calTriggerRange().forEach(d => {
         let x = pos.x + d.x;
         let y = pos.y + d.y;
 

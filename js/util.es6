@@ -1,3 +1,12 @@
+var Common = {
+  // マップサイズ分の空の配列を提供する
+  getEmptyArray: function(initNum = 99) {
+    return [...Array(MAP.height)].map(i => {
+      return [...Array(MAP.width)].map(i => initNum);
+    });
+  }
+};
+
 var FLabel = enchant.Class.create(enchant.Group, {
   initialize: function(str, fontsize, x, y) {
     enchant.Group.call(this);
@@ -30,3 +39,6 @@ var FLabel = enchant.Class.create(enchant.Group, {
     this.x = this.x - this.main._boundWidth;
   },
 });
+
+
+
