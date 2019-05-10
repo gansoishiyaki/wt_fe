@@ -224,30 +224,15 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     this.gage.y = 4;
 
     // gageの枠
-    this.gage.base = new Sprite(gage_width, gage_height);
-    let base_sur = new Surface(gage_width, gage_height);
-    base_sur.context.fillStyle = "#222222";
-    base_sur.context.fillRect(0, 0, gage_width, gage_height);
-    this.gage.base.image = base_sur;
+    this.gage.base = new Square(gage_width, gage_height, "#222222");
     this.gage.addChild(this.gage.base);
 
     // gageの中身
     let main_width = this.hp / this.chara.maxhp * (gage_width - line * 2);
     let main_height = gage_height - line * 2;
-    this.gage.main = new Sprite(main_width, main_height);
+    this.gage.main = new GradSquare(main_width, main_height, {start: "white", end: this.chara.getColor()});
     this.gage.main.x = line;
     this.gage.main.y = line;
-
-    let main_sur = new Surface(main_width, main_height);
-
-    //グラデーション
-    var grad = main_sur.context.createLinearGradient(0, 0, 0, main_height);
-    grad.addColorStop(0, 'white'); 
-    grad.addColorStop(1, this.chara.getColor()); 
-    main_sur.context.fillStyle = grad; 
-    main_sur.context.fillRect(0, 0, main_width, main_height);
-
-    this.gage.main.image = main_sur;
     this.gage.addChild(this.gage.main);
 
     this.addChild(this.gage);

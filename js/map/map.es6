@@ -186,10 +186,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   moveTo: function(chara, pos) {
     let moves = this.calApploach(chara.pos, pos);
-
     let time = FPS / 10;
-    var cue = {};
-
     this.touchMode = TouchMode.disable;
 
     // 移動完了
