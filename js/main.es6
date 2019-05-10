@@ -24,6 +24,10 @@ window.onload = () => {
     game.preload(
       'img/system/gagebase.png', 
       'img/system/gagegreen.png',
+      'img/system/gagewhite.png',
+      'img/system/gageyellow.png',
+      'img/system/numbers.png',
+      'img/system/numbersyellow.png',
       'img/system/mini_status.png',
       'img/system/enemy_mini_status.png')
 
