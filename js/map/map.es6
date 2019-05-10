@@ -2,6 +2,7 @@
 var MapScene = enchant.Class.create(enchant.Scene, {
   selectChara: null,
   localPos: null,
+  charas: [],
 
   initialize: function(data) {
     enchant.Scene.call(this);
@@ -33,20 +34,22 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.menu.image = game.assets['img/system/mini_status.png'];
     this.menu.y = CHIP_SIZE * 9.5;
     this.menu.scale(1, 0.5);
-    this.addChild(this.menu)
+    this.addChild(this.menu);
 
     // 敵の表示
-    this.enemies = data.enemies.map(enemy => {
+    data.enemies.map(enemy => {
       var chara = new MapCharactor(enemy.chara, CampType.enemy);
-      chara.setPos(enemy.x, enemy.y);
+      chara.setPos(new Pos(enemy.x, enemy.y));
       this.field.addChild(chara);
+      this.charas.push(chara);
       return chara;
     });
 
-    this.players = data.players.map((player, i) => {
+    data.players.map((player, i) => {
       var chara = new MapCharactor(party[i]);
-      chara.setPos(player.x, player.y);
+      chara.setPos(new Pos(player.x, player.y));
       this.field.addChild(chara);
+      this.charas.push(chara);
       return chara;
     });
 
@@ -72,12 +75,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     });
   },
 
+  enemies: function() {
+    return this.charas.filter(chara => chara.camp == CampType.enemy);
+  },
+
+  players: function() {
+    return this.charas.filter(chara => chara.camp == CampType.party);
+  },
+
   // player側のキャラクターを移動させるための準備
   prePlayerMove: function() {
     var chara = this.selectChara;
 
     chara.is_move = true;
-    let moves = this.calRange(chara.pos, chara.getMove());
+    let moves = this.calRange(chara.pos, chara.getMove(), chara);
     this.ranges.set_ranges(moves, []);
 
     // 半透明の移動先表示
@@ -91,7 +102,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   // 移動先は移動可能範囲内か
   isMoveEnable: function(pos) {
     var chara = this.selectChara;
-    let moves = this.calRange(chara.pos, chara.getMove());
+    let moves = this.calRange(chara.pos, chara.getMove(), chara);
 
     return moves.filter(p => p.equal(pos)).length > 0;
   },
@@ -134,7 +145,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.status.set_chara(chara);
 
     // 移動範囲計算
-    let moves = this.calRange(chara.pos, chara.getMove());
+    let moves = this.calRange(chara.pos, chara.getMove(), chara);
 
     // 移動範囲から攻撃範囲を計算し、障害物を取り除く
     var attacks = chara.calAttackRange(moves);
@@ -147,11 +158,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   moveTo: function(chara, pos) {
     let moves = this.calApploach(chara.pos, pos);
 
-    let time = FPS;
+    let time = FPS / 10;
     var cue = {};
+
     [...Array(chara.getMove())].forEach((e, i) => {
       cue[time * i] = () => {
-        this.apploach(chara, pos, moves);
+        this.apploach(chara, pos, time, moves);
       };
     });
 
@@ -159,33 +171,56 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   // 目的地へ一歩近づく
-  apploach: function(chara, pos, moves = null) {
+  // chara: キャラクター
+  // pos: 目標
+  // time: 所要時間
+  // moves: 計算済み経路探索(あれば)
+  apploach: function(chara, pos, time = 0, moves = null) {
+    if (chara.pos.equal(pos)) { return false; }
+
     // 計算済みでない場合
     if (!moves) {
       // マップ分の配列を作成する
       moves = this.calApploach(chara.pos, pos);
     }
+
+    // 最短の方向を取得する
+    var length = Infinity;
+    var direction = null;
+    for (var d of DIRECTIONS) {
+      let p = chara.pos.add(d);
+
+      // マップ外の場合は処理しない
+      if (Common.checkPosIsOver(p)) { continue; }
+
+      // より短い場合は最短記録更新
+      if (moves[p.y][p.x] < length) {
+        direction = new Pos(d.x, d.y);
+        length = moves[p.y][p.x];
+      }
+    }
+
+    // 向かうべき方向があれば
+    if (!direction) { return false; }
+
+    console.log(direction);
+    let moveBy = direction.multi(CHIP_SIZE);
+    //chara.setPos(chara.pos.add(direction));
+    chara.pos = chara.pos.add(direction);
+    chara.tl.moveBy(moveBy.x, moveBy.y, time);
+
+    return true;
   },
 
   // 目的地への最短経路計算
-  calApploach: function(start, goal, type = 0) {
+  calApploach: function(start, goal, chara = null) {
     var move = MAP.width * MAP.height;
-    var moves = this.calRangeMoves(goal, move, start);
-
-    // 最短の方向を取得する
-    for (var d of DIRECTIONS) {
-      let x = start.x + d.x;
-      let y = start.y + d.y;
-      let pos = start.add(d);
-
-      // マップ外の場合は処理しない
-      if (Common.checkPosIsOver(pos)) { continue; }
-    }
+    var moves = this.calRangeMoves(goal, move, chara, start);
 
     return moves;
   },
 
-  calRangeMoves(pos, move, goal = null) {
+  calRangeMoves(pos, move, chara = null, goal = null) {
     // マップ分の配列を作成する
     var moves = Common.getEmptyArray();
     moves[pos.y][pos.x] = 0;
@@ -206,7 +241,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
           if (Common.checkPosIsOver(p)) { continue; }
 
           // 通行可能な場合
-          if (!this.hitCol(p) && moves[p.y][p.x] > i + 1) {
+          if (!this.hitCol(p) && !this.hitChara(p, chara) && moves[p.y][p.x] > i + 1) {
             // 最短距離にする
             moves[p.y][p.x] = i + 1;
             poss[i + 1].push(p);
@@ -225,8 +260,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   // 移動範囲計算
-  calRange: function(pos, move) {
-    let moves = this.calRangeMoves(pos, move);
+  calRange: function(pos, move, chara = null) {
+    let moves = this.calRangeMoves(pos, move, chara);
     var move_range = [];
 
     moves.forEach((row, y) => {
@@ -243,7 +278,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   hitCol: function(pos) {
     let chip_num = this.data.data[pos.y][pos.x];
     return this.data.chip.type[chip_num].hit; 
-  }
+  },
+
+  // 別陣営のキャラクターにヒットするか
+  hitChara: function(pos, chara) {
+    if (!chara) {return false;}
+
+    for (var target of this.charas) {
+      if (!chara.isCampEqual(target) && pos.equal(target.pos)) {
+        return true;
+      }
+    }
+
+    return false;
+  },
 });
 
 var Range = enchant.Class.create(enchant.Group, {

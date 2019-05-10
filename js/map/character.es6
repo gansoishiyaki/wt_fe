@@ -65,7 +65,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
         if (!pos.equal(this.pos)) {
           // キャラクターの移動
           scenes.map.moveTo(this, pos);
-          this.move_flag = true;
+          //this.move_flag = true;
         }
       } else {
         // キャラクターのシングルタップ動作
@@ -96,12 +96,15 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     return this.camp == CampType.enemy;
   },
 
+  isCampEqual: function(chara) {
+    return this.camp == chara.camp;
+  },
+
   // キャラクターの位置設定
-  setPos: function(x, y) {
-    this.pos.x = x;
-    this.pos.y = y;
-    this.x = CHIP_SIZE * x;
-    this.y = CHIP_SIZE * y;
+  setPos: function(p) {
+    this.pos = p;
+    this.x = CHIP_SIZE * p.x;
+    this.y = CHIP_SIZE * p.y;
   },
 
   getMove: function() {

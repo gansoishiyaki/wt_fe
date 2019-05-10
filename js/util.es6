@@ -20,6 +20,10 @@ var Pos = function(x = 0, y = 0){
 
   this.add = pos => {
     return new Pos(this.x + pos.x, this.y + pos.y);
+  },
+
+  this.multi = num => {
+    return new Pos(this.x * num, this.y * num);
   }
 }
 
