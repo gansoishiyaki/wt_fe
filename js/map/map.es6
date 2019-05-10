@@ -241,7 +241,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
           if (Common.checkPosIsOver(p)) { continue; }
 
           // 通行可能な場合
-          if (!this.hitCol(p) && !this.hitChara(p, chara) && moves[p.y][p.x] > i + 1) {
+          if (!this.hitCol(p) && 
+              !this.hitChara(p, chara) && 
+              moves[p.y][p.x] > i + 1) {
             // 最短距離にする
             moves[p.y][p.x] = i + 1;
             poss[i + 1].push(p);

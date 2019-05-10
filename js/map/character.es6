@@ -40,7 +40,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
       }
 
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
-      this.tl.delay(FPS / 2).then(() => {
+      this.tl.delay(FPS).then(() => {
         if (!this.is_touch || this.is_move) {return;}
         this.is_touch = false;
 
