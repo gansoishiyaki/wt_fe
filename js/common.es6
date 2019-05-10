@@ -31,3 +31,12 @@ let DIRECTIONS = [
 ];
 
 let FPS = 20;
+
+var Common = {
+  // マップサイズ分の空の配列を提供する
+  getEmptyArray: function(initNum = 99) {
+    return [...Array(MAP.height)].map(i => {
+      return [...Array(MAP.width)].map(i => initNum);
+    });
+  }
+};

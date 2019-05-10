@@ -1,12 +1,3 @@
-var Common = {
-  // マップサイズ分の空の配列を提供する
-  getEmptyArray: function(initNum = 99) {
-    return [...Array(MAP.height)].map(i => {
-      return [...Array(MAP.width)].map(i => initNum);
-    });
-  }
-};
-
 var FLabel = enchant.Class.create(enchant.Group, {
   initialize: function(str, fontsize, x, y) {
     enchant.Group.call(this);
@@ -97,3 +88,14 @@ var CustomNumbers = enchant.Class.create(enchant.Group, {
   },
 });
 
+var Square = enchant.Class.create(enchant.Sprite, {
+  initialize: function(width, height, color = "black") {
+    enchant.Sprite.call(this, width, height);
+
+    this.sur = new Surface(width, height);
+    this.image = this.sur;
+
+    this.sur.context.fillStyle = color;
+    this.sur.context.fillRect(0, 0, width, height);
+  },
+});
