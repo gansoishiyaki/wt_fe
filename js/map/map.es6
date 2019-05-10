@@ -90,7 +90,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 移動できるか
       // 攻撃範囲内かつ敵をターゲット
       if (!this.isMoveEnable(pos) &&
-          !(this.isContainAttakRange(this.selectChara, pos) && this.hitChara(pos, this.selectChara))) { return; }
+          !(this.isContainAttackRange(this.selectChara, pos) && this.hitChara(pos, this.selectChara))) { return; }
 
       // 移動先記録
       this.lastPos = pos;
@@ -98,7 +98,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     });
   },
 
-  isContainAttakRange(chara, pos) {
+  isContainAttackRange(chara, pos) {
     var attacks = chara.calAttackRange([chara.pos]);
     attacks = attacks.filter(pos => !this.hitCol(pos));
 

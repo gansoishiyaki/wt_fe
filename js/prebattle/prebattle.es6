@@ -62,7 +62,7 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
   margin: 10,
   initialize: function(chara, enemy, width, height) {
     this.chara = chara;
-    this.isContainAttakRange = scenes.map.isContainAttakRange(chara, enemy.pos);
+    this.isContainAttackRange = scenes.map.isContainAttackRange(chara, enemy.pos);
     enchant.Group.call(this);
 
     this.window = new GradSquare(width, height, chara.getColors());
@@ -124,7 +124,7 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
         num_str = "yellow";
       }
 
-      if (param_str == "ＨＰ" || this.isContainAttakRange) {
+      if (param_str == "ＨＰ" || this.isContainAttackRange) {
         var number = new CustomNumbers(params[i], width - this.margin * 2, height - 1, num_str);
         number.alignRight();
         this.status.addChild(number);
