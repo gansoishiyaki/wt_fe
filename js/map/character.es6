@@ -33,6 +33,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.addChild(this.gage);
     
     this.main.on(Event.TOUCH_START, e => {
+      console.log('chara touchStart');
       let map = scenes.map;
 
       // キャラ選択中の時は反応しない
@@ -61,7 +62,6 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     });
 
     this.main.on(Event.TOUCH_END, e => {
-      console.log('touchEnd');
       let map = scenes.map;
 
       // タッチモードが何もない場合は終了

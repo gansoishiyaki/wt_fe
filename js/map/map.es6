@@ -68,7 +68,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // カーソル移動時
     this.field.on(Event.TOUCH_MOVE, e => {
       // シングルタップか移動中のみ反応
-      if (!this.touchMode == TouchMode.single && this.touchMode == TouchMode.move) { return; }
+      if (this.touchMode != TouchMode.single && this.touchMode != TouchMode.move) { return; }
       if (!this.lastPos) { return; }
 
       // 以前と位置が同じ場合は終了
@@ -84,6 +84,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 移動先記録
       this.lastPos = pos;
       this.movePreSprite(pos);
+      console.log(pos, this.touchMode);
     });
   },
 
@@ -97,7 +98,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   // player側のキャラクターを移動させるための準備
   prePlayerMove: function() {
-    var chara = this.selectChara;
+    let chara = this.selectChara;
 
     this.touchMode = TouchMode.move;
     let moves = this.calRange(chara.pos, chara.getMove(), chara);
@@ -113,10 +114,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   // 移動先は移動可能範囲内か
   isMoveEnable: function(pos) {
-    var chara = this.selectChara;
-    let moves = this.calRange(chara.pos, chara.getMove(), chara);
-
-    return moves.filter(p => p.equal(pos)).length > 0;
+    return this.ranges.moves.filter(p => p.equal(pos)).length > 0;
   },
 
   // 半透明の移動先の移動
@@ -144,7 +142,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.selectChara = null;
     this.lastPos = null;
 
-    console.log('selectEnd');
+    // 半透明キャラ削除
+    this.field.removeChild(this.preSprite);
   },
 
   calPosByLocal: function(x, y) {
@@ -360,6 +359,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 });
 
 var Range = enchant.Class.create(enchant.Group, {
+  moves: [],
+  attack: [],
+
   initialize: function(map) {
     this.map = map;
     enchant.Group.call(this);
@@ -371,6 +373,8 @@ var Range = enchant.Class.create(enchant.Group, {
 
   set_ranges: function(moves = [], attacks = []) {
     this.removeAll();
+    this.moves = moves;
+    this.attacks = attacks;
 
     moves.forEach(pos => this.drawPos(pos.x, pos.y));
     attacks.forEach(pos => this.drawPos(pos.x, pos.y, COLOR.attack));
