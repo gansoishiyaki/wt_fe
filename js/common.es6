@@ -33,8 +33,9 @@ let CampType = {
 
 let TouchMode = {
   none: 0,
-  move: 1,
-  attack: 2
+  single: 1,
+  move: 2,
+  attack: 3
 }
 
 let FPS = 20;

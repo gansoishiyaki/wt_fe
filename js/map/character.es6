@@ -13,7 +13,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
   initialize: function(data, camp = CampType.party) {
     enchant.Group.call(this);
-    
+
     // init status
     this.data = data;
     this.maxhp = data.maxhp;
@@ -32,10 +32,12 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.addChild(this.gage);
     
     this.main.on(Event.TOUCH_START, e => {
-      this.is_touch = true;
+      let map = scenes.map;
 
       // キャラ選択中の時は反応しない
-      if (scenes.map.touchMode != TouchMode.none) { return; }
+      if (map.touchMode != TouchMode.none) { return; }
+
+      map.touchMode = TouchMode.single;
 
       // 未行動の味方の場合は選択中にする
       if (!this.move_flag && this.is_player()) {
@@ -45,8 +47,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
       this.tl.delay(FPS).then(() => {
-        if (!this.is_touch || this.is_move) {return;}
-        this.is_touch = false;
+        if (map.touchMode != TouchMode.single) {return;}
 
         // 選択終了
         scenes.map.selectEnd();
@@ -57,29 +58,41 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     });
 
     this.main.on(Event.TOUCH_END, e => {
-      // touch開始していない場合は終了
-      if (!this.is_touch) {return}
-      this.is_touch = false;
+      let map = scenes.map;
+
+      // タッチモードが何もない場合は終了
+      if (map.touchMode == TouchMode.none) {return}
 
       // 移動中の場合はキャラクターを移動させる
-      if (this.is_move) {
-        let pos = scenes.map.lastPos;
+      switch (map.touchMode) {
+        case TouchMode.single:
+          // キャラクターのシングルタップ動作
+          scenes.map.touchedChara(this);
 
-        // 同じ位置の場合は無効
-        if (!pos.equal(this.pos)) {
-          // キャラクターの移動
-          scenes.map.moveTo(this, pos);
-          //this.move_flag = true;
-        } else {
+          // 選択終了
           scenes.map.selectEnd();
-        }
-      } else {
-        // キャラクターのシングルタップ動作
-        scenes.map.touchedChara(this);
+          break;
 
-        // 選択終了
-        scenes.map.selectEnd();
+        // 移動中の場合は移動先確定
+        case TouchMode.move:
+          // 味方以外は終了
+          if (!this.is_player()) { return; }
+
+          let pos = scenes.map.lastPos;
+
+          // 同じ位置の場合は移動キャンセル
+          if (!pos.equal(this.pos)) {
+            // キャラクターの移動
+            scenes.map.moveTo(this, pos);
+            //this.move_flag = true;
+          } else {
+            // 移動キャンセル
+            scenes.map.selectEnd();
+          }
+
+          break;
       }
+
     });
   },
 

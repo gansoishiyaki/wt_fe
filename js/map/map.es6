@@ -67,22 +67,24 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // カーソル移動時
     this.field.on(Event.TOUCH_MOVE, e => {
-      if (this.selectChara && !this.selectChara.is_attak) {
-        let pos = this.calPosByLocal(e.localX, e.localY);
+      let pos = this.calPosByLocal(e.localX, e.localY);
+      
+      // キャラ選択されていない場合
+      // 以前と位置が同じ場合は終了
+      if (!this.selectChara || this.lastPos.equal(pos)) { return; }
 
-        // 前回位置と異なるマス目にスライドした場合
-        // 移動フラグをオンにし、位置を記録する
-        if (!this.lastPos.equal(pos)) {
+      switch (this.touchMode) {
+        case TouchMode.single:
           // 移動準備
-          if (!this.selectChara.is_move) { this.prePlayerMove(); }
-
+          this.prePlayerMove();
+        case TouchMode.single, TouchMode.move:
           // 移動できるか
           if (!this.isMoveEnable(pos)) { return; }
 
           // 移動先記録
           this.lastPos = pos;
           this.movePreSprite(this.lastPos);
-        }
+          break;
       }
     });
   },
@@ -99,7 +101,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   prePlayerMove: function() {
     var chara = this.selectChara;
 
-    chara.is_move = true;
+    this.touchMode = TouchMode.move;
     let moves = this.calRange(chara.pos, chara.getMove(), chara);
     this.ranges.set_ranges(moves, []);
 
@@ -134,19 +136,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   selectEnd: function() {
-    if (!this.selectChara) { return; }
 
-    this.lastPos = null;
+    // 移動中は移動範囲クリア
+    if (this.touchMode == TouchMode.move) { this.ranges.clear(); }
 
-    // 移動範囲クリア
-    if (this.selectChara.is_move) {
-      this.ranges.clear();
-    }
-
-    this.selectChara.is_move = false;
-    this.selectChara.is_attak = false;
     this.touchMode = TouchMode.none;
     this.selectChara = null;
+    this.lastPos = null;
   },
 
   calPosByLocal: function(x, y) {
