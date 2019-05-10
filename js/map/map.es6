@@ -58,11 +58,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     });
 
     this.field.on(Event.TOUCH_END, e => {
-      console.log('map touchEnd');
       // キャラクター攻撃時
-      if (this.touchMode == TouchMode.attack) {
-        this.selectEnd();
+      if (this.touchMode != TouchMode.attack) { return; }
+
+      let pos = this.calPosByLocal(e.localX, e.localY);
+
+      // 違う陣営がいるか?
+      for (var chara of this.charas) {
+        if (this.isAttackEnable(pos) && pos.equal(chara.pos)) {
+          console.log(`${chara.data.name}とバトル`);
+          return;
+        }
       }
+
+      this.selectEnd();
     });
 
     // カーソル移動時
@@ -84,7 +93,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 移動先記録
       this.lastPos = pos;
       this.movePreSprite(pos);
-      console.log(pos, this.touchMode);
     });
   },
 
@@ -114,7 +122,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   // 移動先は移動可能範囲内か
   isMoveEnable: function(pos) {
-    return this.ranges.moves.filter(p => p.equal(pos)).length > 0;
+    return this.ranges.moves.find(p => p.equal(pos)) != undefined;
+  },
+
+  // 指定座標は攻撃範囲内か
+  isAttackEnable: function(pos) {
+    return this.ranges.attacks.find(p => p.equal(pos)) != undefined;
   },
 
   // 半透明の移動先の移動

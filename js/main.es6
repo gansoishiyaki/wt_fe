@@ -13,6 +13,8 @@ window.onload = () => {
     // map表示
     scenes.map = new MapScene(Maps.test);
     scenes.status = new StatusScene();
+    scenes.preBattle = new PreBattleScene();
+    
     game.pushScene(scenes.map);
   };
 
