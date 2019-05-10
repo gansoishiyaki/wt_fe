@@ -9,6 +9,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   maxhp: 0,
   is_touch: false,
   is_move: false,
+  is_attack: false,
 
   initialize: function(data, camp = CampType.party) {
     enchant.Group.call(this);
@@ -32,6 +33,9 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     
     this.main.on(Event.TOUCH_START, e => {
       this.is_touch = true;
+
+      // キャラ選択中の時は反応しない
+      if (scenes.map.touchMode != TouchMode.none) { return; }
 
       // 未行動の味方の場合は選択中にする
       if (!this.move_flag && this.is_player()) {
@@ -66,14 +70,16 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
           // キャラクターの移動
           scenes.map.moveTo(this, pos);
           //this.move_flag = true;
+        } else {
+          scenes.map.selectEnd();
         }
       } else {
         // キャラクターのシングルタップ動作
         scenes.map.touchedChara(this);
-      }
 
-      // 選択終了
-      scenes.map.selectEnd();
+        // 選択終了
+        scenes.map.selectEnd();
+      }
     });
   },
 

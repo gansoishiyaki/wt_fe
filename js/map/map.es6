@@ -1,7 +1,8 @@
-// 名前空間を作成
 var MapScene = enchant.Class.create(enchant.Scene, {
   selectChara: null,
+  selectAttack: null,
   localPos: null,
+  touchMode: TouchMode.none,
   charas: [],
 
   initialize: function(data) {
@@ -14,10 +15,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.field.y = CHIP_SIZE * 2;
 
     // フロア
-    this.floor = new Map(CHIP_SIZE, CHIP_SIZE);
-    this.floor.image = game.assets[`img/map/${data.chip.file}.png`];
-    this.floor.loadData(data.data);
-    this.field.addChild(this.floor); 
+    this.floors = [];
+    for(var d of data.data) {
+      var floor = new Map(CHIP_SIZE, CHIP_SIZE);
+      floor.image = game.assets[`img/map/${data.chip.file}.png`];
+      floor.loadData(d);
+      this.field.addChild(floor); 
+    }
 
     // 行動範囲表示
     this.ranges = new Range(this);
@@ -53,9 +57,17 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       return chara;
     });
 
+    this.field.on(Event.TOUCH_END, e => {
+      // キャラクター攻撃時
+      if (this.selectChara && this.selectChara.is_attak) {
+        console.log("selectEnd");
+        this.selectEnd();
+      }
+    });
+
     // カーソル移動時
     this.field.on(Event.TOUCH_MOVE, e => {
-      if (this.selectChara) {
+      if (this.selectChara && !this.selectChara.is_attak) {
         let pos = this.calPosByLocal(e.localX, e.localY);
 
         // 前回位置と異なるマス目にスライドした場合
@@ -125,7 +137,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     if (!this.selectChara) { return; }
 
     this.lastPos = null;
-    this.field.removeChild(this.preSprite);
 
     // 移動範囲クリア
     if (this.selectChara.is_move) {
@@ -133,6 +144,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     }
 
     this.selectChara.is_move = false;
+    this.selectChara.is_attak = false;
+    this.touchMode = TouchMode.none;
     this.selectChara = null;
   },
 
@@ -161,13 +174,48 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let time = FPS / 10;
     var cue = {};
 
-    [...Array(chara.getMove())].forEach((e, i) => {
-      cue[time * i] = () => {
-        this.apploach(chara, pos, time, moves);
-      };
-    });
+    var apploach;
 
-    this.tl.cue(cue);
+    var i = 1;
+    var self = this;
+
+    // 移動完了
+    var finish = () => {
+      // 少しdelayをかけたのち攻撃モードへ
+      this.tl.delay(FPS / 4)
+        .then(() => { this.setAttackMode(chara); });
+    }
+
+    // 再帰関数
+    // 条件を満たすまで一歩ずつ移動する
+    function apploach() {
+      self.apploach(chara, pos, time, moves, result => {
+        // resultは到着済みか
+        // 移動距離に達するか到着したら終了
+        if (!result || i >= chara.getMove()) {
+          finish();
+          return;
+        };
+
+        apploach();
+        i++;
+      }); 
+    } 
+
+    apploach();
+  },
+
+  setAttackMode: function(chara) {
+    // 半透明キャラ削除
+    this.field.removeChild(this.preSprite);
+
+    // 攻撃範囲表示
+    var attacks = chara.calAttackRange([chara.pos]);
+    attacks = attacks.filter(pos => !this.hitCol(pos));
+    this.ranges.set_ranges([], attacks);
+
+    chara.is_attak = true;
+    //this.selectEnd();
   },
 
   // 目的地へ一歩近づく
@@ -175,8 +223,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   // pos: 目標
   // time: 所要時間
   // moves: 計算済み経路探索(あれば)
-  apploach: function(chara, pos, time = 0, moves = null) {
-    if (chara.pos.equal(pos)) { return false; }
+  apploach: function(chara, pos, time = 0, moves = null, func = null) {
+    if (chara.pos.equal(pos)) {
+      // callbackをよぶ
+      if (func) { func(false);}
+      return false; 
+    }
 
     // 計算済みでない場合
     if (!moves) {
@@ -203,11 +255,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 向かうべき方向があれば
     if (!direction) { return false; }
 
-    console.log(direction);
     let moveBy = direction.multi(CHIP_SIZE);
-    //chara.setPos(chara.pos.add(direction));
     chara.pos = chara.pos.add(direction);
-    chara.tl.moveBy(moveBy.x, moveBy.y, time);
+    chara.tl.moveBy(moveBy.x, moveBy.y, time).then(() => {
+      // callbackをよぶ
+      if (func) { func(true);}
+    });
 
     return true;
   },
@@ -278,8 +331,17 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   hitCol: function(pos) {
-    let chip_num = this.data.data[pos.y][pos.x];
-    return this.data.chip.type[chip_num].hit; 
+    var result = false;
+    for (var data of this.data.data) {
+      let chip_num = data[pos.y][pos.x];
+      // 何もない場合はスルー
+      if (chip_num == -1) { continue;}
+
+      // 一番上のタイルを最終判定とする
+      var result = this.data.chip.type[chip_num].hit;
+    }
+
+    return result;
   },
 
   // 別陣営のキャラクターにヒットするか

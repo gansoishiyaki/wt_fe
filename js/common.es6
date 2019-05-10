@@ -31,12 +31,11 @@ let CampType = {
   enemy: 1,
 }
 
-let DIRECTIONS = [
-  {x: 0, y: -1},
-  {x: -1, y: 0},
-  {x: 0, y: 1},
-  {x: 1, y: 0}
-];
+let TouchMode = {
+  none: 0,
+  move: 1,
+  attack: 2
+}
 
 let FPS = 20;
 

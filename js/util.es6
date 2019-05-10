@@ -1,3 +1,10 @@
+let DIRECTIONS = [
+  {x: 0, y: -1},
+  {x: -1, y: 0},
+  {x: 0, y: 1},
+  {x: 1, y: 0}
+];
+
 var Pos = function(x = 0, y = 0){
   this.x = x;
   this.y = y;
