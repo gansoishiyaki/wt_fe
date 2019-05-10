@@ -74,7 +74,7 @@ var Common = {
 };
 
 var FButton = enchant.Class.create(Gage, {
-  initialize: function(str, filename, x, y, width) {
+  initialize: function(str, x, y, width, filename = "button") {
     Gage.call(this, filename, x, y, width, BUTTON.size);
 
     this.str = new FLabel(str, 14, width / 2 + 3, 10);

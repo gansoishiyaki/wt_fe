@@ -1,4 +1,5 @@
 var PreBattleScene = enchant.Class.create(enchant.Scene, {
+  start_flag: false,
   initialize: function() {
     enchant.Scene.call(this);
 
@@ -13,19 +14,33 @@ var PreBattleScene = enchant.Class.create(enchant.Scene, {
     this.main.y = this.margin * 8;
     this.addChild(this.main);
 
+    // button表示
+    this.button = new FButton("戦闘開始", 40, 350, 160);
+    this.addChild(this.button);
+
+    this.button.on(Event.TOUCH_END, e => {
+      this.start_flag = true;
+      game.popScene(this);
+      scenes.battle.setChara(this.player, this.enemy);
+    });
+
+    // キャンセル
     this.on(Event.TOUCH_END, e => {
+      if (this.start_flag) {return;}
       // ウィンドウ削除
       game.popScene(this);
     });
   },
 
   setChara: function(player, enemy) {
+    this.start_flag = false;
+    
     this.player = player;
     this.enemy = enemy;
 
     let margin = 40;
     let width = 100;
-    let y = margin + CHIP_SIZE * 2;
+    let y = margin + CHIP_SIZE * 1.5;
     let height = MAP.height * CHIP_SIZE - margin * 2;
 
     // 右側: プレイヤー側のステータス
@@ -47,6 +62,7 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
   margin: 10,
   initialize: function(chara, enemy, width, height) {
     this.chara = chara;
+    this.isContainAttakRange = scenes.map.isContainAttakRange(chara, enemy.pos);
     enchant.Group.call(this);
 
     this.window = new GradSquare(width, height, chara.getColors());
@@ -108,11 +124,17 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
         num_str = "yellow";
       }
 
-      var number = new CustomNumbers(params[i], width - this.margin * 2, height - 1, num_str);
-      number.alignRight();
-      this.status.addChild(number);
+      if (param_str == "ＨＰ" || this.isContainAttakRange) {
+        var number = new CustomNumbers(params[i], width - this.margin * 2, height - 1, num_str);
+        number.alignRight();
+        this.status.addChild(number);
+      } else {
+        // 攻撃できない位置関係の時は表示しない
+        var number = new FLabel("--", 12, width - this.margin * 3 + 3, height);
+        number.setShadow();
+        number.alignCenter();
+        this.status.addChild(number);
+      }
     });
-
-    console.log(params);
   },
 });

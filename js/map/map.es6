@@ -87,18 +87,22 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 移動準備
       if (this.touchMode == TouchMode.single) { this.prePlayerMove();}
 
-      var attacks = this.selectChara.calAttackRange([this.selectChara.pos]);
-      attacks = attacks.filter(pos => !this.hitCol(pos));
-
       // 移動できるか
       // 攻撃範囲内かつ敵をターゲット
       if (!this.isMoveEnable(pos) &&
-          !(attacks.find(p => p.equal(pos)) != undefined && this.hitChara(pos, this.selectChara))) { return; }
+          !(this.isContainAttakRange(this.selectChara, pos) && this.hitChara(pos, this.selectChara))) { return; }
 
       // 移動先記録
       this.lastPos = pos;
       this.movePreSprite(pos);
     });
+  },
+
+  isContainAttakRange(chara, pos) {
+    var attacks = chara.calAttackRange([chara.pos]);
+    attacks = attacks.filter(pos => !this.hitCol(pos));
+
+    return attacks.find(p => p.equal(pos)) != undefined; 
   },
 
   enemies: function() {
@@ -235,7 +239,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.ranges.set_ranges([], attacks)
 
     // キャンセルボタンセット
-    this.cancelButton = new FButton("取り消し", "button", 130, 3, 100);
+    this.cancelButton = new FButton("取り消し", 130, 3, 100);
     this.menu.addChild(this.cancelButton);
 
     // 移動を取り消し、元の位置に戻る
