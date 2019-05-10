@@ -67,25 +67,23 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // カーソル移動時
     this.field.on(Event.TOUCH_MOVE, e => {
-      let pos = this.calPosByLocal(e.localX, e.localY);
-      
-      // キャラ選択されていない場合
+      // シングルタップか移動中のみ反応
+      if (!this.touchMode == TouchMode.single && this.touchMode == TouchMode.move) { return; }
+      if (!this.lastPos) { return; }
+
       // 以前と位置が同じ場合は終了
-      if (!this.selectChara || this.lastPos.equal(pos)) { return; }
+      let pos = this.calPosByLocal(e.localX, e.localY);
+      if (this.lastPos.equal(pos)) { return; }
 
-      switch (this.touchMode) {
-        case TouchMode.single:
-          // 移動準備
-          this.prePlayerMove();
-        case TouchMode.single, TouchMode.move:
-          // 移動できるか
-          if (!this.isMoveEnable(pos)) { return; }
+      // 移動準備
+      if (this.touchMode == TouchMode.single) { this.prePlayerMove();}
 
-          // 移動先記録
-          this.lastPos = pos;
-          this.movePreSprite(pos);
-          break;
-      }
+      // 移動できるか
+      if (!this.isMoveEnable(pos)) { return; }
+
+      // 移動先記録
+      this.lastPos = pos;
+      this.movePreSprite(pos);
     });
   },
 
@@ -166,6 +164,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 範囲表示
     this.ranges.set_ranges(moves, attacks);
+
+    this.selectEnd();
   },
 
   moveTo: function(chara, pos) {

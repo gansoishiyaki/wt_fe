@@ -10,6 +10,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   is_touch: false,
   is_move: false,
   is_attack: false,
+  timeline: null,
 
   initialize: function(data, camp = CampType.party) {
     enchant.Group.call(this);
@@ -41,19 +42,21 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
       // 未行動の味方の場合は選択中にする
       if (!this.move_flag && this.is_player()) {
-        scenes.map.selectChara = this;
-        scenes.map.lastPos = this.pos.copy();
+        map.lastPos = this.pos.copy();
       }
 
+      map.selectChara = this;
+
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
-      this.tl.delay(FPS).then(() => {
+      this.timeline = this.tl.delay(FPS).then(() => {
         if (map.touchMode != TouchMode.single) {return;}
+
+        // キャラクターステータス表示
+        if (this !== map.selectChara) { return; }
+        scenes.status.setChara(this);
 
         // 選択終了
         scenes.map.selectEnd();
-
-        // キャラクターステータス表示
-        scenes.status.setChara(this);
       });
     });
 
@@ -68,10 +71,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
       switch (map.touchMode) {
         case TouchMode.single:
           // キャラクターのシングルタップ動作
-          scenes.map.touchedChara(this);
-
-          // 選択終了
-          scenes.map.selectEnd();
+          map.touchedChara(this);
           break;
 
         // 移動中の場合は移動先確定
