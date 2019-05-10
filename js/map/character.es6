@@ -129,12 +129,64 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.y = CHIP_SIZE * p.y;
   },
 
+  isMoreAttack: function(enemy) {
+    return (this.getSpd() - enemy.getSpd()) >= 4;
+  },
+
+  // 威力
+  getPower: function(enemy) {
+    var power = this.data.atk + this.trigger().atk;
+    if (enemy) { power -= enemy.getDef(this); }
+
+    return power;
+  },
+
+  getDef: function(enemy) {
+    return this.data.def;
+  },
+
+  getHit: function(enemy) {
+    var hit = this.getTeh() * 2 + this.getLuk(enemy) / 2 + this.trigger().hit;
+    if (enemy) { hit -= (enemy.getAbo(this));}
+    return Math.floor(hit);
+  },
+
+  getAbo: function(enemy) {
+    return this.getSpd(enemy) * 2 + this.getLuk(enemy);
+  },
+
+  getCri: function(enemy) {
+    var cri = this.getTeh() / 2 + this.trigger().cri;
+    if (enemy) { cri -= (enemy.getCriAbo(this));}
+    return Math.floor(cri);
+  },
+
+  getCriAbo: function(enemy) {
+    return this.getLuk(enemy);
+  },
+
+  getSpd: function(enemy) {
+    return this.data.spd;
+  },
+
+  getTeh: function(enemy) {
+    return this.data.teh;
+  },
+
+  getLuk: function(enemy) {
+    return this.data.luk;
+  },
+
   getMove: function() {
     return this.data.move;
   },
 
   getColor: function() {
-    return this.is_enemy() ? COLOR.enemy : COLOR.player;
+    return this.is_player() ? COLOR.player : COLOR.enemy;
+  },
+
+  getColors: function() {
+    return this.is_player() ? COLOR.window.player : COLOR.window.enemy;
   },
 
   trigger: function() {

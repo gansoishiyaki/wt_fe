@@ -87,8 +87,10 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 移動準備
       if (this.touchMode == TouchMode.single) { this.prePlayerMove();}
 
-      // 移動できるか
-      if (!this.isMoveEnable(pos) && !this.isAttackEnable(pos)) { return; }
+      // 移動できるか or
+      // 攻撃範囲内かつ敵がいるか
+      if (!this.isMoveEnable(pos) && 
+          !(this.isAttackEnable(pos) && this.hitChara(pos, this.selectChara))) { return; }
 
       // 移動先記録
       this.lastPos = pos;
