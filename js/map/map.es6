@@ -190,11 +190,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let time = FPS / 10;
     var cue = {};
 
-    var apploach;
-
-    var i = 1;
-    var self = this;
-
     this.touchMode = TouchMode.disable;
 
     // 移動完了
@@ -206,6 +201,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 再帰関数
     // 条件を満たすまで一歩ずつ移動する
+    var i = 1;
+    var self = this;
     function apploach() {
       self.apploach(chara, pos, time, moves, result => {
         // resultは到着済みか
