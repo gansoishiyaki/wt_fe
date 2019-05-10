@@ -82,12 +82,15 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
           if (map.lastPos.equal(this.pos)) {
             // 移動キャンセル
             map.selectEnd();
+          } else if (map.hitChara(map.lastPos, this))  {
+            //敵に攻撃する
+            scenes.preBattle.setChara(this, map.hitChara(map.lastPos, this));
+            map.selectEnd();
           } else {
             // キャラクターの移動
             map.moveTo(this, map.lastPos);
             //this.move_flag = true;
           }
-
           break;
         default:
           break;

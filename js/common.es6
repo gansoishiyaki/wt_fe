@@ -11,14 +11,24 @@ let GAGE = {width: 4, height: 6};
 // メニュー用に上に2, 下に1マス分とる
 let WINDOW = {
   width: CHIP_SIZE * MAP.width,
-  height: CHIP_SIZE * (MAP.height + 2 + 1)
+  height: CHIP_SIZE * (MAP.height + 2 + 1),
 };
 
 let COLOR = {
   move: "#2222ff",
   attack: "#ff4500",
   player: "#00ff7f",
-  enemy: "#ff6347"
+  enemy: "#ff6347",
+  window: {
+    player: {
+      start: "#409982",
+      end: "#294840"
+    },
+    enemy: {
+      start: "#7b3a3a",
+      end: "#331212"
+    }
+  }
 };
 
 let RangeType = {

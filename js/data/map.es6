@@ -54,8 +54,8 @@ let Maps = {
     ]],
     enemies: [{
       chara: Chara.hyrein,
-      x: 3,
-      y: 1
+      x: 2,
+      y: 5
     },],
     players: [
       {x: 3, y: 6},

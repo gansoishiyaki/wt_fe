@@ -66,7 +66,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 違う陣営がいるか?
       for (var chara of this.charas) {
         if (this.isAttackEnable(pos) && pos.equal(chara.pos)) {
-          console.log(`${chara.data.name}とバトル`);
+          scenes.preBattle.setChara(this.selectChara, chara);
           return;
         }
       }
@@ -88,7 +88,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       if (this.touchMode == TouchMode.single) { this.prePlayerMove();}
 
       // 移動できるか
-      if (!this.isMoveEnable(pos)) { return; }
+      if (!this.isMoveEnable(pos) && !this.isAttackEnable(pos)) { return; }
 
       // 移動先記録
       this.lastPos = pos;
@@ -109,8 +109,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let chara = this.selectChara;
 
     this.touchMode = TouchMode.move;
+
+    // 範囲表示
     let moves = this.calRange(chara.pos, chara.getMove(), chara);
-    this.ranges.set_ranges(moves, []);
+    var attacks = chara.calAttackRange(moves);
+    attacks = attacks.filter(pos => !this.hitCol(pos));
+    this.ranges.set_ranges(moves, attacks);
 
     // 半透明の移動先表示
     let localPos = chara.pos.localPos();
@@ -363,7 +367,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     for (var target of this.charas) {
       if (!chara.isCampEqual(target) && pos.equal(target.pos)) {
-        return true;
+        return target;
       }
     }
 
@@ -394,17 +398,10 @@ var Range = enchant.Class.create(enchant.Group, {
   },
 
   drawPos: function(x, y, color = COLOR.move) {
-    var sprite = new Sprite(CHIP_SIZE, CHIP_SIZE);
-    sprite.x = CHIP_SIZE * x;
-    sprite.y = CHIP_SIZE * y;
-
     let line = 1;
-
-    // 四角形表示
-    var surface = new Surface(CHIP_SIZE, CHIP_SIZE);
-    surface.context.fillStyle = color;
-    surface.context.fillRect(line, line, CHIP_SIZE - line * 2,  CHIP_SIZE - line * 2);
-    sprite.image = surface;
+    var sprite = new Square(CHIP_SIZE - line * 2, CHIP_SIZE - line * 2, color);
+    sprite.x = CHIP_SIZE * x + line;
+    sprite.y = CHIP_SIZE * y + line;
     sprite.opacity = 0.5;
 
     this.addChild(sprite);

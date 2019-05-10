@@ -27,14 +27,7 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     // ウィンドウ
     let window_width = WINDOW.width - this.margin * 2;
     let window_height = WINDOW.height - this.margin * 16;
-    this.window = new Sprite(window_width, window_height);
-    var sur = new Surface(window_width, window_height);
-    var grad = sur.context.createLinearGradient(0, 0, 0, window_height);
-    grad.addColorStop(0, "#409982");
-    grad.addColorStop(1, "#294840");
-    sur.context.fillStyle = grad;
-    sur.context.fillRect(0, 0, window_width, window_height);
-    this.window.image = sur;
+    this.window = new GradSquare(window_width, window_height, COLOR.window.player);
     this.main.addChild(this.window);
 
     // 顔グラ表示
@@ -74,6 +67,7 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     this.status.x = this.margin + 3;
     this.status.y = 130;
     this.main.addChild(this.status);
+
     Object.keys(Status).forEach((key, i) => {
       // ステータスラベル
       var height = i * 25;
