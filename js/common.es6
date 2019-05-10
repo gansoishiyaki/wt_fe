@@ -42,9 +42,15 @@ let FPS = 20;
 
 var Common = {
   // マップサイズ分の空の配列を提供する
-  getEmptyArray: function(initNum = 99) {
+  getEmptyArray: function(initNum = Infinity) {
     return [...Array(MAP.height)].map(i => {
       return [...Array(MAP.width)].map(i => initNum);
     });
-  }
+  },
+
+  checkPosIsOver: function(pos) {
+    if (pos.x < 0 || pos.y < 0) { return true; }
+    if (pos.x >= MAP.width || pos.y >= MAP.height) { return true;}
+    return false;
+  },
 };

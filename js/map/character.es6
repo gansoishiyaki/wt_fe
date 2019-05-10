@@ -40,7 +40,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
       }
 
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
-      this.tl.delay(FPS / 2).then(function(){
+      this.tl.delay(FPS / 2).then(() => {
         if (!this.is_touch || this.is_move) {return;}
         this.is_touch = false;
 
@@ -57,15 +57,23 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
       if (!this.is_touch) {return}
       this.is_touch = false;
 
-      // 選択終了
-      scenes.map.selectEnd();
-
+      // 移動中の場合はキャラクターを移動させる
       if (this.is_move) {
-        // キャラクターの移動
+        let pos = scenes.map.lastPos;
+
+        // 同じ位置の場合は無効
+        if (!pos.equal(this.pos)) {
+          // キャラクターの移動
+          scenes.map.moveTo(this, pos);
+          this.move_flag = true;
+        }
       } else {
         // キャラクターのシングルタップ動作
         scenes.map.touchedChara(this);
       }
+
+      // 選択終了
+      scenes.map.selectEnd();
     });
   },
 
@@ -131,9 +139,8 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     [...Array(side_length).keys()].forEach(y => {
        [...Array(side_length).keys()].forEach(x => {
         let pos = new Pos(x - tr, y - tr);
-        let abs = Math.abs(pos.x) + Math.abs(pos.y);
-        if (abs != 0 && abs <= tr) {
-          range.push({x: x - tr, y: y - tr});
+        let abs = pos.abs();
+        if (abs > 0 && abs <= tr) {
           range.push(new Pos(x - tr, y - tr));
         }
        });
@@ -164,7 +171,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
         if (x >= MAP.width || y >= MAP.height) {return;}
         
         // 移動範囲に入っていない場合
-        if (moves[y][x] == 99 && attacks[y][x] == 99) {
+        if (moves[y][x] == Infinity && attacks[y][x] == Infinity) {
           attacks[y][x] = 1;
           return attack_range.push({x: x, y: y});
         }

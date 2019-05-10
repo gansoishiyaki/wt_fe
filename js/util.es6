@@ -12,6 +12,14 @@ var Pos = function(x = 0, y = 0){
 
   this.copy = () => {
     return new Pos(this.x, this.y);
+  },
+
+  this.abs = (pos = {x: 0, y: 0}) => {
+    return Math.abs(this.x - pos.x) + Math.abs(this.y - pos.y);
+  },
+
+  this.add = pos => {
+    return new Pos(this.x + pos.x, this.y + pos.y);
   }
 }
 
@@ -49,7 +57,7 @@ var FLabel = enchant.Class.create(enchant.Group, {
 });
 
 var Gage = enchant.Class.create(enchant.Group, {
-  initialize: function(filename, x, y, width, height){
+  initialize: function(filename, x, y, width, size){
     enchant.Group.call(this);
 
     let image = game.assets[`img/system/${filename}.png`];
@@ -57,20 +65,20 @@ var Gage = enchant.Class.create(enchant.Group, {
     this.x = x;
     this.y = y;
 
-    this.left = new Sprite(GAGE.width, height);
+    this.left = new Sprite(size.width, size.height);
     this.left.image = image;
     this.addChild(this.left);
 
-    this.right = new Sprite(GAGE.width, height);
+    this.right = new Sprite(size.width, size.height);
     this.right.image = image;
-    this.right.x = width - GAGE.width;
+    this.right.x = width - size.width;
     this.right.frame = 2;
     this.addChild(this.right);
 
-    this.main = new Sprite(GAGE.width, height);
+    this.main = new Sprite(size.width, size.height);
     this.main.image = image;
-    this.main.scale((width - GAGE.width * 2)/GAGE.width, 1);
-    this.main.x = (this.main.scaleX + 1) * GAGE.width / 2;
+    this.main.scale((width - size.width * 2) / size.width, 1);
+    this.main.x = (this.main.scaleX + 1) * size.width / 2;
     this.main.frame = 1;
     this.addChild(this.main);
   },
