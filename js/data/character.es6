@@ -63,7 +63,7 @@ let Chara = {
     teh: 25,
     spd: 26,
     luk: 12,
-    move: 10,
+    move: 2,
     main_trigger: Skill.lambillis,
     trigger: []
   }, 

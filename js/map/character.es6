@@ -58,6 +58,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     });
 
     this.main.on(Event.TOUCH_END, e => {
+      console.log('touchEnd');
       let map = scenes.map;
 
       // タッチモードが何もない場合は終了
@@ -78,18 +79,18 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
           // 味方以外は終了
           if (!this.is_player()) { return; }
 
-          let pos = scenes.map.lastPos;
-
           // 同じ位置の場合は移動キャンセル
-          if (!pos.equal(this.pos)) {
-            // キャラクターの移動
-            scenes.map.moveTo(this, pos);
-            //this.move_flag = true;
-          } else {
+          if (map.lastPos.equal(this.pos)) {
             // 移動キャンセル
-            scenes.map.selectEnd();
+            map.selectEnd();
+          } else {
+            // キャラクターの移動
+            map.moveTo(this, map.lastPos);
+            //this.move_flag = true;
           }
 
+          break;
+        default:
           break;
       }
 

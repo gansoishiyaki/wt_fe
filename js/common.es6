@@ -32,6 +32,7 @@ let CampType = {
 }
 
 let TouchMode = {
+  disable: -1,
   none: 0,
   single: 1,
   move: 2,

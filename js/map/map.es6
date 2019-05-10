@@ -58,9 +58,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     });
 
     this.field.on(Event.TOUCH_END, e => {
+      console.log('map touchEnd');
       // キャラクター攻撃時
-      if (this.selectChara && this.selectChara.is_attak) {
-        console.log("selectEnd");
+      if (this.touchMode == TouchMode.attack) {
         this.selectEnd();
       }
     });
@@ -83,7 +83,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
           // 移動先記録
           this.lastPos = pos;
-          this.movePreSprite(this.lastPos);
+          this.movePreSprite(pos);
           break;
       }
     });
@@ -128,7 +128,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.preSprite.y = localPos.y;
 
     // 元の位置と同じ場合は表示しない
-    if (this.selectChara.pos.abs(pos) == 0) {
+    if (this.selectChara.pos.equal(pos)) {
       this.preSprite.main.opacity = 0;
     } else {
       this.preSprite.main.opacity = 0.5;
@@ -136,13 +136,17 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   selectEnd: function() {
-
     // 移動中は移動範囲クリア
-    if (this.touchMode == TouchMode.move) { this.ranges.clear(); }
+    if (this.touchMode == TouchMode.move || 
+        this.touchMode == TouchMode.attack) { 
+      this.ranges.clear(); 
+    }
 
     this.touchMode = TouchMode.none;
     this.selectChara = null;
     this.lastPos = null;
+
+    console.log('selectEnd');
   },
 
   calPosByLocal: function(x, y) {
@@ -174,6 +178,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     var i = 1;
     var self = this;
+
+    this.touchMode = TouchMode.disable;
 
     // 移動完了
     var finish = () => {
@@ -210,8 +216,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     attacks = attacks.filter(pos => !this.hitCol(pos));
     this.ranges.set_ranges([], attacks);
 
-    chara.is_attak = true;
-    //this.selectEnd();
+    this.touchMode = TouchMode.attack;
   },
 
   // 目的地へ一歩近づく
