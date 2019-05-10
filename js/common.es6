@@ -1,3 +1,6 @@
+// バージョン
+Version = "0.1";
+
 // マス目のサイズ
 let CHIP_SIZE = 40;
 
@@ -22,6 +25,11 @@ let RangeType = {
   move: 1,
   attack: 2
 };
+
+let CampType = {
+  party: 0,
+  enemy: 1,
+}
 
 let DIRECTIONS = [
   {x: 0, y: -1},

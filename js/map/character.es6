@@ -4,13 +4,13 @@
 //////////////////////////////
 
 var MapCharactor = enchant.Class.create(enchant.Group, {
-  is_enemy: false,
+  camp: CampType.party,
   hp: 0,
   maxhp: 0,
   is_touch: false,
   is_move: false,
 
-  initialize: function(data, is_enemy = false) {
+  initialize: function(data, camp = CampType.party) {
     enchant.Group.call(this);
     
     // init status
@@ -20,7 +20,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.pos = {x: 0, y: 0};
     this.move_flag = false;
     this.range = {};
-    this.is_enemy = is_enemy;
+    this.camp = camp;
     
     // mainスプライト
     this.main = new Sprite(CHIP_SIZE, CHIP_SIZE);
@@ -34,6 +34,9 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.main.on(Event.TOUCH_START, e => {
       this.is_touch = true;
 
+      // 以前の行動範囲削除
+      scenes.map.ranges.clear();
+
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
       this.tl.delay(FPS / 2).then(function(){
         if (!this.is_touch || this.is_move) {return;}
@@ -42,6 +45,11 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
         // キャラクターステータス表示
         scenes.status.setChara(this);
       });
+    });
+
+    // カーソル移動時
+    this.main.on(Event.TOUCH_START, e => {
+      
     });
 
     this.main.on(Event.TOUCH_END, e => {
@@ -56,6 +64,10 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
         scenes.map.touchedChara(this);
       }
     });
+  },
+
+  is_enemy: function() {
+    return this.camp == CampType.enemy;
   },
 
   // キャラクターの位置設定

@@ -15,6 +15,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.floor.loadData(data.data);
     this.field.addChild(this.floor); 
 
+    // 行動範囲表示
     this.ranges = new Range(this);
     this.field.addChild(this.ranges);
 
@@ -33,7 +34,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 敵の表示
     this.enemies = data.enemies.map(enemy => {
-      var chara = new MapCharactor(enemy.chara, true);
+      var chara = new MapCharactor(enemy.chara, CampType.enemy);
       chara.setPos(enemy.x, enemy.y);
       this.field.addChild(chara);
       return chara;
@@ -113,6 +114,10 @@ var Range = enchant.Class.create(enchant.Group, {
     enchant.Group.call(this);
   },
 
+  clear: function() {
+    this.removeAll();
+  },
+
   set_ranges: function(moves = [], attacks = []) {
     this.removeAll();
 
@@ -155,7 +160,7 @@ var MiniStatus = enchant.Class.create(enchant.Group, {
     this.chara = chara;
 
     // ウィンドウ表示
-    let filename = chara.is_enemy ? "enemy_mini_status" : "mini_status";
+    let filename = chara.is_enemy() ? "enemy_mini_status" : "mini_status";
     this.window = new Sprite(WINDOW.width, CHIP_SIZE * 2);
     this.window.image = game.assets[`img/system/${filename}.png`];
     this.addChild(this.window); 
