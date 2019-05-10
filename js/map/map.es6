@@ -138,7 +138,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 移動範囲から攻撃範囲を計算し、障害物を取り除く
     var attacks = chara.calAttackRange(moves);
-    attacks = attacks.filter(pos => !this.hitCol(pos.x, pos.y));
+    attacks = attacks.filter(pos => !this.hitCol(pos));
 
     // 範囲表示
     this.ranges.set_ranges(moves, attacks);
@@ -176,10 +176,10 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     for (var d of DIRECTIONS) {
       let x = start.x + d.x;
       let y = start.y + d.y;
+      let pos = start.add(d);
 
-      // マイナスは処理しない
-      if (x < 0 || y < 0) { continue; }
-      if (x >= MAP.width || y >= MAP.height) {continue;}
+      // マップ外の場合は処理しない
+      if (Common.checkPosIsOver(pos)) { continue; }
     }
 
     return moves;
@@ -200,22 +200,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       for (var pos of poss[i]) {
         // 指定位置から四方向
         for (var d of DIRECTIONS) {
-          let x = pos.x + d.x;
-          let y = pos.y + d.y;
           let p = pos.add(d);
 
-          // マイナスは処理しない
+          // マップ外の場合は処理しない
           if (Common.checkPosIsOver(p)) { continue; }
 
           // 通行可能な場合
-          if (!this.hitCol(x, y) && moves[y][x] > i + 1) {
+          if (!this.hitCol(p) && moves[p.y][p.x] > i + 1) {
             // 最短距離にする
-            moves[y][x] = i + 1;
-            poss[i + 1].push(new Pos(x, y));
+            moves[p.y][p.x] = i + 1;
+            poss[i + 1].push(p);
 
             // ゴールが設定されている場合
             // たどり着いたら終了する
-            if (goal && goal.equal(new Pos(x, y))) {
+            if (goal && goal.equal(p)) {
               return moves;
             }
           }
@@ -242,11 +240,10 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     return move_range;
   },
 
-  // 衝突チェック
-  hitCol: function(x, y) {
-    let chip_num = this.data.data[y][x];
-    return this.data.chip.type[chip_num].hit;
-  },
+  hitCol: function(pos) {
+    let chip_num = this.data.data[pos.y][pos.x];
+    return this.data.chip.type[chip_num].hit; 
+  }
 });
 
 var Range = enchant.Class.create(enchant.Group, {

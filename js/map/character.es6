@@ -163,17 +163,15 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
     move_range.forEach(pos => {
       this.calTriggerRange().forEach(d => {
-        let x = pos.x + d.x;
-        let y = pos.y + d.y;
+        let p = pos.add(d);
 
-        // マイナスは処理しない
-        if (x < 0 || y < 0) { return; }
-        if (x >= MAP.width || y >= MAP.height) {return;}
+        // マップ外の場合は処理しない
+        if (Common.checkPosIsOver(p)) { return; }
         
         // 移動範囲に入っていない場合
-        if (moves[y][x] == Infinity && attacks[y][x] == Infinity) {
-          attacks[y][x] = 1;
-          return attack_range.push({x: x, y: y});
+        if (moves[p.y][p.x] == Infinity && attacks[p.y][p.x] == Infinity) {
+          attacks[p.y][p.x] = 1;
+          return attack_range.push(p);
         }
       });
     });

@@ -48,6 +48,7 @@ var Common = {
     });
   },
 
+  // posがマップ外か
   checkPosIsOver: function(pos) {
     if (pos.x < 0 || pos.y < 0) { return true; }
     if (pos.x >= MAP.width || pos.y >= MAP.height) { return true;}
