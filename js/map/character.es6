@@ -42,6 +42,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
       // 未行動の味方の場合は選択中にする
       if (!this.move_flag && this.is_player()) {
+        this.beforePos = this.pos.copy();
         map.lastPos = this.pos.copy();
       }
 

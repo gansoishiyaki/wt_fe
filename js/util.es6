@@ -62,6 +62,10 @@ var FLabel = enchant.Class.create(enchant.Group, {
     this.addChild(this.main);
   },
 
+  alignCenter: function() {
+    this.x = this.x - this.main._boundWidth / 2;
+  },
+
   alignRight: function() {
     this.x = this.x - this.main._boundWidth;
   },

@@ -7,6 +7,12 @@ let CHIP_SIZE = 40;
 // マップは6*8
 let MAP = {width: 6, height: 8};
 let GAGE = {width: 4, height: 6};
+let BUTTON = {
+  size: {
+    width: 25,
+    height: 33
+  },
+};
 
 // メニュー用に上に2, 下に1マス分とる
 let WINDOW = {
@@ -66,3 +72,14 @@ var Common = {
     return false;
   },
 };
+
+var FButton = enchant.Class.create(Gage, {
+  initialize: function(str, filename, x, y, width) {
+    Gage.call(this, filename, x, y, width, BUTTON.size);
+
+    this.str = new FLabel(str, 14, width / 2 + 3, 10);
+    this.str.setShadow();
+    this.str.alignCenter();
+    this.addChild(this.str);
+  },
+});

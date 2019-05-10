@@ -28,6 +28,7 @@ window.onload = () => {
       'img/system/gagegreen.png',
       'img/system/gagewhite.png',
       'img/system/gageyellow.png',
+      'img/system/button.png',
       'img/system/numbers.png',
       'img/system/numbersyellow.png',
       'img/system/mini_status.png',

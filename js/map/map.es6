@@ -34,10 +34,10 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.addChild(this.status);
 
     // メニュー表示
-    this.menu = new Sprite(WINDOW.width, CHIP_SIZE * 2);
-    this.menu.image = game.assets['img/system/mini_status.png'];
-    this.menu.y = CHIP_SIZE * 9.5;
-    this.menu.scale(1, 0.5);
+    this.menu = new Group(WINDOW.width, CHIP_SIZE);
+    this.menu.y = CHIP_SIZE * 10;
+    var menu_window = new GradSquare(WINDOW.width, CHIP_SIZE, COLOR.window.player);
+    this.menu.addChild(menu_window);
     this.addChild(this.menu);
 
     // 敵の表示
@@ -87,10 +87,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 移動準備
       if (this.touchMode == TouchMode.single) { this.prePlayerMove();}
 
-      // 移動できるか or
-      // 攻撃範囲内かつ敵がいるか
-      if (!this.isMoveEnable(pos) && 
-          !(this.isAttackEnable(pos) && this.hitChara(pos, this.selectChara))) { return; }
+      var attacks = this.selectChara.calAttackRange([this.selectChara.pos]);
+      attacks = attacks.filter(pos => !this.hitCol(pos));
+
+      // 移動できるか
+      // 攻撃範囲内かつ敵をターゲット
+      if (!this.isMoveEnable(pos) &&
+          !(attacks.find(p => p.equal(pos)) != undefined && this.hitChara(pos, this.selectChara))) { return; }
 
       // 移動先記録
       this.lastPos = pos;
@@ -161,6 +164,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.selectChara = null;
     this.lastPos = null;
 
+    // 取り消しボタン削除
+    this.menu.removeChild(this.cancelButton);
+
     // 半透明キャラ削除
     this.field.removeChild(this.preSprite);
   },
@@ -226,7 +232,18 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 攻撃範囲表示
     var attacks = chara.calAttackRange([chara.pos]);
     attacks = attacks.filter(pos => !this.hitCol(pos));
-    this.ranges.set_ranges([], attacks);
+    this.ranges.set_ranges([], attacks)
+
+    // キャンセルボタンセット
+    this.cancelButton = new FButton("取り消し", "button", 130, 3, 100);
+    this.menu.addChild(this.cancelButton);
+
+    // 移動を取り消し、元の位置に戻る
+    this.cancelButton.on(Event.TOUCH_END, e=> {
+      let chara = this.selectChara;
+      chara.setPos(chara.beforePos);
+      this.selectEnd();
+    });
 
     this.touchMode = TouchMode.attack;
   },
