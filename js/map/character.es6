@@ -17,14 +17,13 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.data = data;
     this.maxhp = data.maxhp;
     this.hp = this.maxhp;
-    this.pos = {x: 0, y: 0};
-    this.move_flag = false;
+    this.pos = new Pos();
     this.range = {};
+    this.move_flag = false;
     this.camp = camp;
     
     // mainスプライト
-    this.main = new Sprite(CHIP_SIZE, CHIP_SIZE);
-    this.main.image = game.assets[`img/chara/map/${data.id}.png`];
+    this.main = this.mainSprite();
     this.addChild(this.main);
 
     // キャラクター下部のHP表示
@@ -34,28 +33,32 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.main.on(Event.TOUCH_START, e => {
       this.is_touch = true;
 
-      // 以前の行動範囲削除
-      scenes.map.ranges.clear();
+      // 未行動の味方の場合は選択中にする
+      if (!this.move_flag && this.is_player()) {
+        scenes.map.selectChara = this;
+        scenes.map.lastPos = this.pos.copy();
+      }
 
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
       this.tl.delay(FPS / 2).then(function(){
         if (!this.is_touch || this.is_move) {return;}
         this.is_touch = false;
 
+        // 選択終了
+        scenes.map.selectEnd();
+
         // キャラクターステータス表示
         scenes.status.setChara(this);
       });
-    });
-
-    // カーソル移動時
-    this.main.on(Event.TOUCH_START, e => {
-      
     });
 
     this.main.on(Event.TOUCH_END, e => {
       // touch開始していない場合は終了
       if (!this.is_touch) {return}
       this.is_touch = false;
+
+      // 選択終了
+      scenes.map.selectEnd();
 
       if (this.is_move) {
         // キャラクターの移動
@@ -64,6 +67,21 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
         scenes.map.touchedChara(this);
       }
     });
+  },
+
+  // 本体の画像取得
+  mainSprite: function() {
+    var group = new Group();
+    var sprite = new Sprite(CHIP_SIZE, CHIP_SIZE);
+    sprite.image = game.assets[`img/chara/map/${this.data.id}.png`];
+    group.main = sprite;
+    group.addChild(sprite);
+
+    return group;
+  },
+
+  is_player: function() {
+    return this.camp == CampType.party;
   },
 
   is_enemy: function() {
@@ -83,7 +101,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   },
 
   getColor: function() {
-    return this.is_enemy ? COLOR.enemy : COLOR.player;
+    return this.is_enemy() ? COLOR.enemy : COLOR.player;
   },
 
   trigger: function() {
@@ -112,10 +130,11 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     var range = [];
     [...Array(side_length).keys()].forEach(y => {
        [...Array(side_length).keys()].forEach(x => {
-        let pos = {x: x - tr, y: y - tr};
+        let pos = new Pos(x - tr, y - tr);
         let abs = Math.abs(pos.x) + Math.abs(pos.y);
         if (abs != 0 && abs <= tr) {
           range.push({x: x - tr, y: y - tr});
+          range.push(new Pos(x - tr, y - tr));
         }
        });
     });

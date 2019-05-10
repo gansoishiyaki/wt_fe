@@ -1,3 +1,20 @@
+var Pos = function(x = 0, y = 0){
+  this.x = x;
+  this.y = y;
+
+  this.localPos = () => {
+    return {x: this.x * CHIP_SIZE, y: this.y * CHIP_SIZE};
+  },
+
+  this.equal = pos => {
+    return this.x == pos.x && this.y == pos.y;
+  },
+
+  this.copy = () => {
+    return new Pos(this.x, this.y);
+  }
+}
+
 var FLabel = enchant.Class.create(enchant.Group, {
   initialize: function(str, fontsize, x, y) {
     enchant.Group.call(this);

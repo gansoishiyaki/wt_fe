@@ -1,5 +1,8 @@
 // 名前空間を作成
 var MapScene = enchant.Class.create(enchant.Scene, {
+  selectChara: null,
+  localPos: null,
+
   initialize: function(data) {
     enchant.Scene.call(this);
 
@@ -46,6 +49,58 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       this.field.addChild(chara);
       return chara;
     });
+
+    // カーソル移動時
+    this.field.on(Event.TOUCH_MOVE, e => {
+      if (this.selectChara) {
+        let local_pos = this.calPosByLocal(e.localX, e.localY);
+
+        // 前回位置と異なるマス目にスライドした場合
+        // 移動フラグをオンにし、位置を記録する
+        if (!this.lastPos.equal(local_pos)) {
+          // 移動準備
+          if (!this.selectChara.is_move) { this.prePlayerMove(); }
+
+          // 移動できるか
+          this.lastPos = local_pos;
+          this.movePreSprite(this.lastPos);
+        }
+      }
+    });
+  },
+
+  // player側のキャラクターを移動させるための準備
+  prePlayerMove: function() {
+    var chara = this.selectChara;
+
+    chara.is_move = true;
+    let moves = this.calRange(chara.pos, chara.getMove());
+    this.ranges.set_ranges(moves, []);
+
+    // 半透明の移動先表示
+    let localPos = chara.pos.localPos();
+    this.preSprite = chara.mainSprite();
+    this.preSprite.x = localPos.x;
+    this.preSprite.y = localPos.y;
+    this.preSprite.main.opacity = 0.5;
+    this.field.addChild(this.preSprite);
+  },
+
+  movePreSprite(pos) {
+    let localPos = pos.localPos();
+    this.preSprite.x = localPos.x;
+    this.preSprite.y = localPos.y;
+  },
+
+  selectEnd: function() {
+    this.selectChara = null;
+    this.lastPos = null;
+    
+    this.field.removeChild(this.preSprite);
+  },
+
+  calPosByLocal: function(x, y) {
+    return new Pos(Math.floor(x / CHIP_SIZE), Math.floor(y / CHIP_SIZE));
   },
 
   // キャラクターシングルタップ
