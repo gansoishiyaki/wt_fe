@@ -71,7 +71,7 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
     // 名前
     this.name_text = new FLabel(chara.data.name, 13, 7, 7);
     this.name_text.setShadow();
-    this.addChild(this.name_text)
+    this.addChild(this.name_text);
     if (chara.is_player()) {
       this.name_text.x = width - 6;
       this.name_text.alignRight();
