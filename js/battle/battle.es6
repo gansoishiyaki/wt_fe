@@ -1,22 +1,29 @@
+var BattleTaskType = {
+  player: 0,
+  enemy: 1,
+  finish: 2
+};
+
 var BattleScene = enchant.Class.create(enchant.Scene, {
+
   initialize: function() {
     enchant.Scene.call(this);
 
     // 黒背景と少し白も入れる
     this.back = new Square(WINDOW.width, WINDOW.height);
-    this.back.opacity = 0.7;
+    this.back.opacity = 0.75;
     this.addChild(this.back);
     this.white = new Square(WINDOW.width, WINDOW.height, "white");
-    this.white.opacity = 0.2;
+    this.white.opacity = 0.15;
     this.addChild(this.white);
 
     // header
-    this.header = new Square(WINDOW.width, CHIP_SIZE * 3);
+    this.header = new Square(WINDOW.width, CHIP_SIZE * 2);
     this.addChild(this.header);
 
     // footer
-    this.footer = new Square(WINDOW.width, CHIP_SIZE);
-    this.footer.y = CHIP_SIZE * 10;
+    this.footer = new Square(WINDOW.width, CHIP_SIZE * 2);
+    this.footer.y = CHIP_SIZE * 9;
     this.addChild(this.footer);
 
     this.main = new Group();
@@ -36,21 +43,57 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     this.enemy_window = new BattleStatusWindow(enemy, player);
     this.main.addChild(this.enemy_window);
 
-    this.player_animation = this.setAnimation(player, enemy);
-    this.main.addChild(this.player_animation);
-
     this.enemy_animation = this.setAnimation(enemy, player);
     this.enemy_animation.setEnemy();
     this.main.addChild(this.enemy_animation);
 
+    this.player_animation = this.setAnimation(player, enemy);
+    this.main.addChild(this.player_animation);
+
     game.pushScene(this);
 
-    // プレイヤーの攻撃
-    this.player_animation.attack(() => {
-      this.enemy_animation.attack(() => {
-        game.popScene(this);
-      });
-    });
+    // バトル実行の流れ
+    this.cue = [];
+    this.cue.push(BattleTaskType.player);
+    this.cue.push(BattleTaskType.enemy);
+    this.cue.push(BattleTaskType.finish);
+
+    // タスク実行
+    var i = 0;
+    var exec = () => {
+      let taskType = this.cue[i];
+      i++;
+
+      // 攻撃不可の場合は飛ばす
+      if (!scenes.map.isContainAttackRange(player, enemy.pos)) {
+        exec();
+        return;
+      }
+
+      // どちらかが死んだ場合は攻撃しない
+      if (player.isDead() || enemy.isDead()) {
+        taskType = BattleTaskType.finish;
+      }
+
+      switch(taskType) {
+        case BattleTaskType.player:
+          // 味方の攻撃
+          let attackplayer = new BattleAttack(player, enemy);
+          this.player_animation.attack(attackplayer, () => { exec(); });
+          break;
+        case BattleTaskType.enemy:
+          // 敵の攻撃
+          let attack = new BattleAttack(enemy, player);
+          this.enemy_animation.attack(attack, () => { exec(); });
+          break;
+        case BattleTaskType.finish:
+          game.popScene(this);
+          scenes.map.finishBattle(player, enemy);
+          break;
+      }
+    };
+
+    exec();
   },
 
   // キャラクターごとのアニメーションクラスを呼び出す
@@ -61,6 +104,29 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     }
   },
 });
+
+/////////////////////////
+// 攻撃
+// is_hit 命中
+// damage 威力
+/////////////////////////
+var BattleAttack = function(chara, enemy) {
+  this.chara = chara;
+  this.enemy = enemy;
+
+  // 命中判定
+  let hit = chara.getHit(enemy);
+  this.is_hit = random(100) <= hit;
+  this.damage = chara.getPower(enemy);
+  this.damage = 100;
+  let cri = chara.getCri(enemy);
+  this.is_critical = random(100) <= cri;
+  if (this.is_critical) {
+    this.damage += chara.getPower();
+  }
+  
+  this.finish = () => {};
+};
 
 /////////////////////////
 // バトル予測ステータス画面
@@ -74,7 +140,7 @@ var BattleStatusWindow = enchant.Class.create(enchant.Group, {
 
     let width = WINDOW.width / 2;
     let height = CHIP_SIZE * 3;
-    this.y = CHIP_SIZE * 7;
+    this.y = CHIP_SIZE * 6;
 
     this.window = new GradSquare(width, height, chara.getColors());
     this.addChild(this.window);
@@ -152,6 +218,9 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
   initialize: function(chara) {
     enchant.Group.call(this);
 
+    this.chara = chara;
+    chara.battleGage = this;
+
     let size = {width: 2, height: 8};
 
     this.gages = [...Array(chara.maxhp).keys()].map(i => {
@@ -178,7 +247,32 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
     this.setHP(chara.hp);
   },
 
+  damage: function(attack) {
+    this.chara.damage(attack.damage);
+
+    let sa = Math.abs(this.hp - this.chara.hp);
+    var frame = sa >= 10 ? 1 : 2;
+
+    let cue = {};
+    [...Array(sa).keys()].forEach(i =>{
+      cue[i * frame] = () => {
+        let change = this.hp >= this.chara.hp ? -1 : 1;
+        this.setHP(this.hp + change);
+      };
+    });
+
+    // その攻撃で死んだ場合
+    if (this.chara.isDead()) {
+
+    }
+
+    let tl = this.tl.cue(cue).delay(10).then(() => {
+      attack.finish();
+    });
+  },
+
   setHP: function(hp) {
+    this.hp = hp;
     this.gages.forEach((gage, i) => {
       gage.opacity = hp > i ? 1 : 0;
     });

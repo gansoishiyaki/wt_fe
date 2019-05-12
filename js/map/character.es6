@@ -119,6 +119,17 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     return this.camp == CampType.enemy;
   },
 
+  damage: function(damage) {
+    this.hp -= damage;
+    this.hp = this.hp <= 0 ? 0 : this.hp;
+    this.hp = this.hp >= this.maxhp ? this.maxhp : this.hp;
+    this.gage.setHP();
+  },
+
+  isDead: function() {
+    return this.hp <= 0;
+  },
+
   isCampEqual: function(chara) {
     return this.camp == chara.camp;
   },
@@ -130,51 +141,51 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.y = CHIP_SIZE * p.y;
   },
 
-  isMoreAttack: function(enemy) {
+  isMoreAttack: function(enemy = null) {
     return (this.getSpd() - enemy.getSpd()) >= 4;
   },
 
   // 威力
-  getPower: function(enemy) {
+  getPower: function(enemy = null) {
     var power = this.data.atk + this.trigger().atk;
     if (enemy) { power -= enemy.getDef(this); }
 
     return power;
   },
 
-  getDef: function(enemy) {
+  getDef: function(enemy = null) {
     return this.data.def;
   },
 
-  getHit: function(enemy) {
+  getHit: function(enemy = null) {
     var hit = this.getTeh() * 2 + this.getLuk(enemy) / 2 + this.trigger().hit;
     if (enemy) { hit -= (enemy.getAbo(this));}
     return Math.floor(hit);
   },
 
-  getAbo: function(enemy) {
+  getAbo: function(enemy = null) {
     return this.getSpd(enemy) * 2 + this.getLuk(enemy);
   },
 
-  getCri: function(enemy) {
+  getCri: function(enemy = null) {
     var cri = this.getTeh() / 2 + this.trigger().cri;
     if (enemy) { cri -= (enemy.getCriAbo(this));}
     return Math.floor(cri);
   },
 
-  getCriAbo: function(enemy) {
+  getCriAbo: function(enemy = null) {
     return this.getLuk(enemy);
   },
 
-  getSpd: function(enemy) {
+  getSpd: function(enemy = null) {
     return this.data.spd;
   },
 
-  getTeh: function(enemy) {
+  getTeh: function(enemy = null) {
     return this.data.teh;
   },
 
-  getLuk: function(enemy) {
+  getLuk: function(enemy = null) {
     return this.data.luk;
   },
 
@@ -268,30 +279,36 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     this.hp = this.chara.hp;
 
     // gage
-    let gage_width = CHIP_SIZE - this.fontsize;
-    let gage_height = 6;
-    let line = 1;
+    this.gage_width = CHIP_SIZE - this.fontsize;
+    this.gage_height = 6;
+    this.line = 1;
 
     this.gage = new Group();
     this.gage.x = this.fontsize - 2;
     this.gage.y = 4;
 
     // gageの枠
-    this.gage.base = new Square(gage_width, gage_height, "#222222");
+    this.gage.base = new Square(this.gage_width, this.gage_height, "#222222");
     this.gage.addChild(this.gage.base);
-
-    // gageの中身
-    let main_width = this.hp / this.chara.maxhp * (gage_width - line * 2);
-    let main_height = gage_height - line * 2;
-    this.gage.main = new GradSquare(main_width, main_height, {start: "white", end: this.chara.getColor()});
-    this.gage.main.x = line;
-    this.gage.main.y = line;
-    this.gage.addChild(this.gage.main);
-
     this.addChild(this.gage);
 
     // hp
-    this.hp_sprite = new FLabel(`${this.hp}`, this.fontsize, 0, 0);
+    this.setHP();
+  },
+
+  setHP: function() {
+    // ゲージ
+    if (this.gage.main) {this.gage.removeChild(this.gage.main);}
+    let main_height = this.gage_height - this.line * 2;
+    let main_width = this.chara.hp / this.chara.maxhp * (this.gage_width - this.line * 2);
+    this.gage.main = new GradSquare(main_width, main_height, {start: "white", end: this.chara.getColor()});
+    this.gage.main.x = this.line;
+    this.gage.main.y = this.line;
+    this.gage.addChild(this.gage.main);
+
+    // 表示HP
+    if (this.hp_sprite) {this.removeChild(this.hp_sprite);}
+    this.hp_sprite = new FLabel(`${this.chara.hp}`, this.fontsize, 0, 0);
     this.hp_sprite.main.color = this.chara.getColor();
     this.hp_sprite.setShadow();
     this.addChild(this.hp_sprite);

@@ -49,6 +49,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       return chara;
     });
 
+    // 味方の表示
     data.players.map((player, i) => {
       var chara = new MapCharactor(party[i]);
       chara.setPos(new Pos(player.x, player.y));
@@ -173,6 +174,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 半透明キャラ削除
     this.field.removeChild(this.preSprite);
+  },
+
+  // 戦闘終了
+  finishBattle: function(chara, enemy) {
+    // キャラクターを行動済みにする
+    // this.chara.move_flag = true;
+    this.selectEnd();
   },
 
   calPosByLocal: function(x, y) {

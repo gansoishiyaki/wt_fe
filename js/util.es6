@@ -5,7 +5,7 @@ let DIRECTIONS = [
   {x: 1, y: 0}
 ];
 
-var ramdom = function(max, min = 0) {
+var random = function(max, min = 0) {
   return Math.floor(Math.random() * (max + 1 - min)) + min;
 }
 
@@ -83,24 +83,34 @@ var Gage = enchant.Class.create(enchant.Group, {
 
     this.x = x;
     this.y = y;
-
+    this.size = size;
+    this.width = width;
     this.left = new Sprite(size.width, size.height);
     this.left.image = image;
     this.addChild(this.left);
-
     this.right = new Sprite(size.width, size.height);
     this.right.image = image;
-    this.right.x = width - size.width;
     this.right.frame = 2;
     this.addChild(this.right);
-
     this.main = new Sprite(size.width, size.height);
     this.main.image = image;
-    this.main.scale((width - size.width * 2) / size.width, 1);
-    this.main.x = (this.main.scaleX + 1) * size.width / 2;
     this.main.frame = 1;
     this.addChild(this.main);
+
+    this.print();
   },
+
+  setWidth: function(width) {
+    this.size.width = width();
+    this.print();
+  },
+
+  print: function() {
+    this.right.x = this.width - this.size.width;
+
+    this.main.scale((this.width - this.size.width * 2) / this.size.width, 1);
+    this.main.x = (this.main.scaleX + 1) * this.size.width / 2;
+  }
 });
 
 var CustomNumbers = enchant.Class.create(enchant.Group, {
@@ -129,6 +139,12 @@ var CustomNumbers = enchant.Class.create(enchant.Group, {
 
   alignRight: function() {
     this.x = this.x - this.str_width;
+  },
+
+  // 左右反転
+  flip: function() {
+    this.scaleX = -1;
+    this.x += this.str_width;
   },
 });
 
