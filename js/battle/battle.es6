@@ -118,7 +118,6 @@ var BattleAttack = function(chara, enemy) {
   let hit = chara.getHit(enemy);
   this.is_hit = random(100) <= hit;
   this.damage = chara.getPower(enemy);
-  this.damage = 100;
   let cri = chara.getCri(enemy);
   this.is_critical = random(100) <= cri;
   if (this.is_critical) {

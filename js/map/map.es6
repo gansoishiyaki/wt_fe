@@ -4,6 +4,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   localPos: null,
   touchMode: TouchMode.none,
   charas: [],
+  deadCharas: [],
 
   initialize: function(data) {
     enchant.Scene.call(this);
@@ -178,8 +179,21 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   // 戦闘終了
   finishBattle: function(chara, enemy) {
+    // 死んだキャラがいる場合はフェードアウト
+    var deads = this.charas.filter(c => c.isDead());
+    this.deadCharas = this.deadCharas.concat(deads);
+    this.deadCharas.forEach(c => {
+      c.tl
+        .delay(5)
+        .removeFromScene();
+    });
+    // 死んだキャラを配列から覗く
+    this.charas = this.charas.filter(c => !c.isDead());
+
     // キャラクターを行動済みにする
     // this.chara.move_flag = true;
+
+    // 選択終了
     this.selectEnd();
   },
 
