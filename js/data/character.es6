@@ -54,7 +54,10 @@ let Chara = {
     luk: 3,
     move: 2,
     main_trigger: Skill.alektor,
-    trigger: []
+    trigger: [],
+    images: {
+      bard: "img/battle/bard.png"
+    }
   },
   hyuse: {
     id: "hyuse",
@@ -69,7 +72,8 @@ let Chara = {
     luk: 12,
     move: 2,
     main_trigger: Skill.lambillis,
-    trigger: []
+    trigger: [],
+    images: {}
   }, 
 }
 

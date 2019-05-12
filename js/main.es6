@@ -54,6 +54,11 @@ window.onload = () => {
   function preload_chara(chara) {
     game.preload(`img/chara/map/${chara.id}.png`);
     game.preload(`img/chara/status/${chara.id}.png`);
+    game.preload(`img/chara/battle/${chara.id}.png`);
+
+    for (key in chara.images) {
+      game.preload(chara.images[key]);
+    }
   }
 
   function previewCenter ( game ){

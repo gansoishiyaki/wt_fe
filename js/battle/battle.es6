@@ -2,10 +2,13 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
   initialize: function() {
     enchant.Scene.call(this);
 
-    // 黒背景
+    // 黒背景と少し白も入れる
     this.back = new Square(WINDOW.width, WINDOW.height);
     this.back.opacity = 0.7;
     this.addChild(this.back);
+    this.white = new Square(WINDOW.width, WINDOW.height, "white");
+    this.white.opacity = 0.2;
+    this.addChild(this.white);
 
     // header
     this.header = new Square(WINDOW.width, CHIP_SIZE * 3);
@@ -15,20 +18,47 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     this.footer = new Square(WINDOW.width, CHIP_SIZE);
     this.footer.y = CHIP_SIZE * 10;
     this.addChild(this.footer);
+
+    this.main = new Group();
+    this.addChild(this.main);
   },
 
   setChara: function(player, enemy) {
+    this.main.removeAll();
+
     this.player = player;
     this.enemy = enemy;
 
     this.player_window = new BattleStatusWindow(player, enemy);
     this.player_window.x = WINDOW.width / 2;
-    this.addChild(this.player_window);
+    this.main.addChild(this.player_window);
 
     this.enemy_window = new BattleStatusWindow(enemy, player);
-    this.addChild(this.enemy_window);
+    this.main.addChild(this.enemy_window);
+
+    this.player_animation = this.setAnimation(player, enemy);
+    this.main.addChild(this.player_animation);
+
+    this.enemy_animation = this.setAnimation(enemy, player);
+    this.enemy_animation.setEnemy();
+    this.main.addChild(this.enemy_animation);
 
     game.pushScene(this);
+
+    // プレイヤーの攻撃
+    this.player_animation.attack(() => {
+      this.enemy_animation.attack(() => {
+        game.popScene(this);
+      });
+    });
+  },
+
+  // キャラクターごとのアニメーションクラスを呼び出す
+  setAnimation: function(player, enemy) {
+    switch (player.data.id){
+      case "hyrein":
+        return new Hyrein(player, enemy);
+    }
   },
 });
 
@@ -124,7 +154,7 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
 
     let size = {width: 2, height: 8};
 
-    var gages = [...Array(chara.maxhp).keys()].map(i => {
+    this.gages = [...Array(chara.maxhp).keys()].map(i => {
       let x = i % 36 * (size.width + 1);
       let y = Math.floor(i / 36) * (size.height + 1);
 
@@ -137,7 +167,20 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
       this.addChild(gage);
       gage.x = x;
       gage.y = y;
+
+      if(chara.hp <= i) {
+        gage.opacity = 0;
+      }
+
       return gage;
+    });
+
+    this.setHP(chara.hp);
+  },
+
+  setHP: function(hp) {
+    this.gages.forEach((gage, i) => {
+      gage.opacity = hp > i ? 1 : 0;
     });
   },
 });

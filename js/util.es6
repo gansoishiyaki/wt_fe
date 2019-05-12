@@ -5,6 +5,10 @@ let DIRECTIONS = [
   {x: 1, y: 0}
 ];
 
+var ramdom = function(max, min = 0) {
+  return Math.floor(Math.random() * (max + 1 - min)) + min;
+}
+
 var Pos = function(x = 0, y = 0){
   this.x = x;
   this.y = y;
