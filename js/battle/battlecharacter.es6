@@ -68,11 +68,24 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     // ゲージを減らす
     this.chara.battleGage.damage(attack);
 
-    number.tl.delay(10).removeFromScene();
+    number.tl.moveBy(0, -10, 3).moveBy(0, 5, 3).delay(10).removeFromScene();
   },
+
   avoid: function() {
     this.frame(0);
+
+    // missの表記
+    let pos = this.sprite.getCenterPos(); 
+    let str = new FLabel("Miss!", 14, pos.x, pos.y - 40);
+    str.setShadow();
+    this.addChild(str);
+
+    // 左右反転
+    if (this.is_flip) { str.flip();}
+
+    str.tl.moveBy(0, -10, 3).moveBy(0, 5, 3).delay(10).removeFromScene();
   },
+
   dead: function() {},
 });
 

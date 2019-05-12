@@ -73,6 +73,12 @@ var FLabel = enchant.Class.create(enchant.Group, {
   alignRight: function() {
     this.x = this.x - this.main._boundWidth;
   },
+
+  // 左右反転
+  flip: function() {
+    this.scaleX = -1;
+    this.x += this.main._boundWidth;
+  },
 });
 
 var Gage = enchant.Class.create(enchant.Group, {
