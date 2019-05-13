@@ -32,9 +32,12 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.gage = new MiniGage(this);
     this.addChild(this.gage);
     
-    this.main.on(Event.TOUCH_START, e => {
+    this.touch_start = this.main.on(Event.TOUCH_START, e => {
       let map = scenes.map;
       this.is_touch = true;
+
+      // イベント貼り直し
+      if (this.timeline) { this.timeline.clear();}
 
       // キャラ選択中の時は反応しない
       if (map.touchMode != TouchMode.none) { return; }
@@ -107,7 +110,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   // ターン開始され、移動可能に
   canMove: function() {
     this.move_flag = false;
-    this.main.main.opacity = 1;
+    this.main.main.resetGrayImage();
   },
 
   // 行動終了
@@ -334,19 +337,20 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     this.gage.addChild(this.gage.base);
     this.addChild(this.gage);
 
+    let main_height = this.gage_height - this.line * 2;
+    let main_width = this.gage_width - this.line * 2;
+    this.gage.main = new GradSquare(main_width, main_height, {start: "white", end: this.chara.getColor()});
+    this.gage.main.x = this.line;
+    this.gage.main.y = this.line;
+    this.gage.addChild(this.gage.main);
+
     // hp
     this.setHP();
   },
 
   setHP: function() {
     // ゲージ
-    if (this.gage.main) {this.gage.removeChild(this.gage.main);}
-    let main_height = this.gage_height - this.line * 2;
-    let main_width = this.chara.hp / this.chara.maxhp * (this.gage_width - this.line * 2);
-    this.gage.main = new GradSquare(main_width, main_height, {start: "white", end: this.chara.getColor()});
-    this.gage.main.x = this.line;
-    this.gage.main.y = this.line;
-    this.gage.addChild(this.gage.main);
+    this.gage.main.scaleX = this.chara.hp / this.chara.maxhp; 
 
     // 表示HP
     if (this.hp_sprite) {this.removeChild(this.hp_sprite);}

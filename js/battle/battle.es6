@@ -133,7 +133,6 @@ var BattleAttack = function(chara, enemy) {
     this.damage += chara.getPower();
   }
   
-  this.damage = 100;
   this.finish = () => {};
 };
 

@@ -95,6 +95,6 @@ var FButton = enchant.Class.create(Gage, {
  * @param msg 
  */
 var postTwitter = msg => {
-  let str = `${msg}\n\n#ワートリFE\nhttps://gansoishiyaki.sakura.ne.jp/game/wt/srpg/`;
+  let str = `${msg}\n\n#ワートリFEごっこ\nhttps://gansoishiyaki.sakura.ne.jp/game/wt/srpg/`;
   tweetMsg(str);
 }

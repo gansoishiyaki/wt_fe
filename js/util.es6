@@ -56,6 +56,11 @@ var FSprite = enchant.Class.create(enchant.Sprite, {
     this.image = this.assetfile;
   },
 
+  resetGrayImage: function() {
+    this.image = this.assetfile;
+    this.opacity = 1;
+  },
+
   setGrayImage: function() {
     // サーバーでないと動かない
     if (!location.href.startsWith('http')) {

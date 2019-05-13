@@ -172,7 +172,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       target = enemy.getMostPriority(containChara);
 
       let attacks = enemy.calAttackRange([target.pos]);
-      target_pos = this.getMostPriority(enemy, target, attacks); 
+      target_pos = this.getMostPriority(enemy, target, attacks);
     } else {
       // 範囲内に敵がいない場合は、全キャラクターの優先度をチェックする
       target = enemy.getMostPriority(charas);
@@ -180,7 +180,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     }
 
     var moves = this.calApploach(enemy.pos, target_pos, enemy);
-    console.log(moves);
 
     // 移動終了
     let moved = () => {
@@ -382,7 +381,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.charas = this.charas.filter(c => !c.isDead());
 
     // HPを更新する
-    this.charas.forEach(c => c.gage.setHP());
+    this.tl.delay(5).then( () => {this.charas.forEach(c => c.gage.setHP());});
 
     // キャラクターを行動済みにする
     chara.moved();
@@ -419,7 +418,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   getMoveAndAttackRange: function(chara) {
     // 移動範囲計算
-    let moves = this.calRange(chara.pos, chara.getMove(), chara);
+    var moves = this.calRange(chara.pos, chara.getMove(), chara);
 
     // 移動範囲から攻撃範囲を計算し、障害物を取り除く
     var attacks = chara.calAttackRange(moves);

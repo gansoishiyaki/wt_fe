@@ -34,7 +34,7 @@ var BattleResultScene = enchant.Class.create(enchant.Scene, {
     result_str.setShadow();
     this.main.addChild(result_str);
 
-    var twitter_msg = result ? "勝利!" : "負けてしまった……\n相手:";
+    var twitter_msg = result ? "勝利!\n相手:" : "負けてしまった……\n相手:";
 
     // 敵のラベル
     var enemy_str = new FLabel("相手ユニット", 13, 10);
@@ -56,7 +56,7 @@ var BattleResultScene = enchant.Class.create(enchant.Scene, {
       twitter_msg += `${e.data.name}/`
     });
 
-    twitter_msg += "\nキャラ:";
+    twitter_msg += "\nあなた:";
 
     // 敵のラベル
     var player_str = new FLabel("あなたのユニット", 13, 10);
