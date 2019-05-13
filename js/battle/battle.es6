@@ -36,19 +36,28 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     this.player = player;
     this.enemy = enemy;
 
+    // 敵側からの攻撃の時は左右逆転させる
+    var is_flip = enemy.is_player() && !player.is_player();
+
     this.player_window = new BattleStatusWindow(player, enemy);
-    this.player_window.x = WINDOW.width / 2;
     this.main.addChild(this.player_window);
 
     this.enemy_window = new BattleStatusWindow(enemy, player);
     this.main.addChild(this.enemy_window);
 
     this.enemy_animation = this.setAnimation(enemy, player);
-    this.enemy_animation.setEnemy();
     this.main.addChild(this.enemy_animation);
 
     this.player_animation = this.setAnimation(player, enemy);
     this.main.addChild(this.player_animation);
+
+    if (is_flip) {
+      this.enemy_window.x = WINDOW.width / 2;
+      this.player_animation.setFlip();
+    } else {
+      this.player_window.x = WINDOW.width / 2;
+      this.enemy_animation.setFlip();
+    }
 
     game.pushScene(this);
 

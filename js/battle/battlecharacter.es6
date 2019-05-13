@@ -27,7 +27,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   },
 
   // 相手側の場合は反転して表示する
-  setEnemy: function() {
+  setFlip: function() {
     this.scaleX = -1;
     this.is_flip = true;
     this.x += WINDOW.width;

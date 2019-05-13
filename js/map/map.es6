@@ -45,7 +45,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 敵の表示
     data.enemies.map(enemy => {
       var chara = new MapCharactor(enemy.chara, CampType.enemy);
+      // 位置
       chara.setPos(new Pos(enemy.x, enemy.y));
+
+      // 思考ルーチン
+      chara.routine = enemy.routine;
+
       this.field.addChild(chara);
       this.charas.push(chara);
       return chara;
@@ -104,8 +109,98 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   // 敵のターン
-  enemyTurn: function() {
-    this.enemies().forEach(e => e.moved());
+  enemyTurn: function(camp) {
+    // 敵の攻撃タスク
+    var enemies = this.sameCampCharas(camp);
+
+    // 次のタスクを実行するコールバック
+    var i = 0;
+    this.finishEnemyAction = () => {
+      // 全員行動終了済みか
+      if (enemies.length <= i) { return; }
+
+      // 敵の行動開
+      this.enemyAction(enemies[i]);
+      i++;
+    };
+
+    this.finishEnemyAction();
+  },
+
+  enemyAction: function(enemy) {
+    switch(enemy.routine) {
+      case RoutineType.none:
+      this.enemyActionNormal(enemy);
+      break;
+    }
+  },
+
+  // 猪突猛進タイプの思考ルーチン
+  enemyActionNormal: function(enemy) {
+    // 攻撃範囲内に敵がいるか
+    let charas = this.otherCampCharas(enemy);
+    let containChara = this.checkContainAttackRange(enemy, charas);
+
+    var move_max = enemy.getMove();
+
+    // ターゲット指定
+    var target;
+    if (containChara.length > 0) {
+      // 敵がいる場合は、その中での優先度を決める
+      target = enemy.getMostPriority(containChara);
+
+      // 既に攻撃範囲内か
+      if (this.isContainAttackRange(enemy, target.pos)) {
+
+      }
+    } else {
+      // 範囲内に敵がいない場合は、全キャラクターの優先度をチェックする
+      target = enemy.getMostPriority(charas);
+    }
+
+    var moves = this.calApploach(enemy.pos, target.pos);;
+
+    // 移動終了
+    let moved = () => {
+      if (containChara.length > 0) {
+        // 攻撃開始
+        scenes.battle.setChara(enemy, target);
+      } else {
+        // 移動して行動終了　
+        this.finishEnemyAction();
+      }
+    }
+
+    // 目標地点まで移動する
+    var i = 1;
+    let self = this;
+    function move() {
+      self.apploach(enemy, target.pos, FPS / 10, moves, result => {
+        if (!result || i >= move_max) {
+          self.tl.delay(5).then(() => moved());
+          return;
+        }
+
+        move();
+        i++;
+      });
+    }
+
+    // 移動開始
+    move();
+
+    console.log(`${enemy.data.name} target:${target.data.name}`);
+  },
+
+  // 攻撃範囲内に敵がいるか
+  checkContainAttackRange(chara, enemies) {
+    // 攻撃範囲内に敵がいるか
+    let range = this.getMoveAndAttackRange(chara);
+    let containChara = enemies.filter(c => {
+      return range.find(p => p.equal(c.pos)) != undefined;
+    });
+
+    return containChara;
   },
 
   // 味方の状況、敵の状況をチェックして
@@ -115,9 +210,11 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     if (this.players().length == 0) {
       // 敗北
       console.log("敗北");
+      return;
     } else if (this.enemies().length == 0) {
       // 勝利
       console.log("勝利");
+      return;
     }
 
     // ターン終了かチェック
@@ -149,7 +246,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       case TurnType.player:
       this.TouchMode = TouchMode.disable;
       this.turn = TurnType.enemy;
-      this.enemyTurn();
+      this.enemyTurn(CampType.enemy);
       break;
 
       case TurnType.enemy:
@@ -252,8 +349,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // キャラクターを行動済みにする
     chara.moved();
 
-    // 選択終了
-    this.selectEnd();
+    if (chara.is_player()) {
+      // 選択終了
+      this.selectEnd();
+    } else {
+      // 次のキャラへ
+      this.finishEnemyAction();
+    }
   },
 
   calPosByLocal: function(x, y) {
@@ -275,6 +377,15 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.ranges.set_ranges(moves, attacks);
 
     this.selectEnd();
+  },
+
+  getMoveAndAttackRange: function(chara) {
+    // 移動範囲計算
+    let moves = this.calRange(chara.pos, chara.getMove(), chara);
+
+    // 移動範囲から攻撃範囲を計算し、障害物を取り除く
+    var attacks = chara.calAttackRange(moves);
+    return moves.concat(attacks);
   },
 
   moveTo: function(chara, pos) {
@@ -300,7 +411,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
         if (!result || i >= chara.getMove()) {
           finish();
           return;
-        };
+        }
 
         apploach();
         i++;
@@ -470,6 +581,14 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     }
 
     return false;
+  },
+
+  sameCampCharas: function(camp) {
+    return this.charas.filter(c => c.camp == camp);
+  },
+
+  otherCampCharas: function(camp) {
+    return this.charas.filter(c => c.camp != camp);
   },
 });
 

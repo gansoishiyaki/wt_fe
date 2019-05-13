@@ -283,6 +283,26 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
     return attack_range; 
   },
+
+  // 優先度の高いキャラを取得する
+  getMostPriority: function(charas) {
+    return charas.reduce((c, result) => {
+      let expected = this.getExpected(c);
+      return expected > result ? expected : result;
+    });
+  },
+
+  // 期待値を取得する
+  getExpected: function(chara) {
+    let power = this.getPower(chara);
+    let hit = this.getHit(chara);
+    let cri = this.getCri(chara);
+    let cri_power = power + this.getPower();
+
+    var expected = hit * cri * cri_power;
+    expected += hit * (100 - cri) * power;
+    return expected;
+  },
 });
 
 var MiniGage = enchant.Class.create(enchant.Group, {

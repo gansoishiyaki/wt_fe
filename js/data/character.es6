@@ -53,6 +53,7 @@ let Chara = {
     spd: 22,
     luk: 3,
     move: 2,
+    neighbor: true,
     main_trigger: Skill.alektor,
     trigger: [],
     images: {
@@ -71,6 +72,7 @@ let Chara = {
     spd: 26,
     luk: 12,
     move: 2,
+    neighbor: true,
     main_trigger: Skill.lambillis,
     trigger: [],
     images: {}
