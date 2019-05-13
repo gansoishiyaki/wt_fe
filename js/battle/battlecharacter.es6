@@ -2,7 +2,6 @@
 // アニメーション
 // この各クラスは、共通関数を持つ
 //////////////////////////////
-
 var BattleChara = enchant.Class.create(enchant.Group, {
   height: CHIP_SIZE * 3 - 10,
   is_flip: false,
@@ -22,17 +21,31 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.addChild(this.sprite);
   },
 
+  /**
+   * ## frame
+   * フレーム数をセットする
+   * @param {Int} i フレーム数
+   */
   frame: function(i) {
     this.sprite.main.frame = i;
   },
 
   // 相手側の場合は反転して表示する
+  /**
+   * ## setFlip
+   * 反転して表示する
+   */
   setFlip: function() {
     this.scaleX = -1;
     this.is_flip = true;
     this.x += WINDOW.width;
   },
 
+  /**
+   * ## getEnemyPos
+   * 左右反転した相手の座標を取得する
+   * @return {Pos} 座標
+   */
   getEnemyPos: function() {
     let pos = this.enemy.battle.sprite.getCenterPos();
     pos.x = WINDOW.width - pos.x;
@@ -41,6 +54,12 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
   attack: function(attack, func) {},
   critical: function(attack, func) { attack(func);},
+
+  /**
+   * ## attack
+   * 共通関数
+   * @param {BattleAttack} attack 攻撃情報
+   */
   damage: function(attack) {
     // 攻撃が当たっていない場合は回避へ
     if (!attack.is_hit) {
@@ -49,7 +68,9 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     }
 
     this.frame(0);
-
+    this._damage();
+  },
+  _damage: function(attack) {
     // 被ダメージシェイク
     let tl = this.sprite.tl;
     [...Array(4)].forEach((a, i) => {
@@ -77,9 +98,15 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     number.tl.moveBy(0, -10, 3).moveBy(0, 5, 3).delay(10).removeFromScene();
   },
 
+  /**
+   * ## avoid
+   * 回避 共通関数
+   */
   avoid: function() {
     this.frame(0);
-
+    this._avoid();
+  },
+  _avoid: function() {
     // missの表記
     let pos = this.sprite.getCenterPos(); 
     let str = new FLabel("Miss!", 14, pos.x, pos.y - 40);
