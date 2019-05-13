@@ -3,7 +3,7 @@ let TriggerRangeType = {
   line: 1
 }
 
-let Skill = {
+let Trigger = {
   alektor: {
     id: "alektor",
     name: "【卵の冠(アレクトール)】",
@@ -31,6 +31,7 @@ let Skill = {
     type: TriggerRangeType.normal
   }
 }
+
 let Status = {
  maxhp: "ＨＰ",
  atk: "攻撃",
@@ -54,7 +55,7 @@ let Chara = {
     luk: 3,
     move: 2,
     neighbor: true,
-    main_trigger: Skill.alektor,
+    main_trigger: Trigger.alektor,
     trigger: [],
     images: {
       bard: "img/battle/bard.png"
@@ -73,8 +74,8 @@ let Chara = {
     luk: 12,
     move: 2,
     neighbor: true,
-    main_trigger: Skill.lambillis,
-    trigger: [],
+    main_trigger: Trigger.lambillis,
+    skills: [],
     images: {}
   }, 
 }

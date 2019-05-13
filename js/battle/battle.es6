@@ -63,18 +63,28 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
 
     // バトル実行の流れ
     this.cue = [];
-    this.cue.push(BattleTaskType.player);
-    this.cue.push(BattleTaskType.enemy);
-    this.cue.push(BattleTaskType.finish);
+    this.cue.push(new BattlePhase(BattleTaskType.player, player, enemy));
+    this.cue.push(new BattlePhase(BattleTaskType.enemy, enemy, player));
+
+    if (player.isMoreAttack(enemy)) {
+      this.cue.push(new BattlePhase(BattleTaskType.player, player, enemy));
+    }
+    if (enemy.isMoreAttack(player)) {
+      this.cue.push(new BattlePhase(BattleTaskType.enemy, enemy, player));
+    }
+
+    this.cue.push(new BattlePhase(BattleTaskType.finish));
 
     // タスク実行
     var i = 0;
     var exec = () => {
-      let taskType = this.cue[i];
+      let phase = this.cue[i];
+      var taskType = phase.type;
       i++;
 
       // 攻撃不可の場合は飛ばす
-      if (!scenes.map.isContainAttackRange(player, enemy.pos)) {
+      if (!phase.isFinish() && 
+          !scenes.map.isContainAttackRange(phase.player, phase.enemy.pos)) {
         exec();
         return;
       }
@@ -87,13 +97,11 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
       switch(taskType) {
         case BattleTaskType.player:
           // 味方の攻撃
-          let attackplayer = new BattleAttack(player, enemy);
-          this.player_animation.attack(attackplayer, () => { exec(); });
+          this.player_animation.attack(phase.attack, () => { exec(); });
           break;
         case BattleTaskType.enemy:
           // 敵の攻撃
-          let attack = new BattleAttack(enemy, player);
-          this.enemy_animation.attack(attack, () => { exec(); });
+          this.enemy_animation.attack(phase.attack, () => { exec(); });
           break;
         case BattleTaskType.finish:
           game.popScene(this);
@@ -110,9 +118,24 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     switch (player.data.id){
       case "hyrein":
         return new Hyrein(player, enemy);
+      default:
+        return new Hyrein(player, enemy);
     }
   },
 });
+
+var BattlePhase = function(type, player = null, enemy = null) {
+  this.type = type;
+  this.player = player;
+  this.enemy = enemy;
+
+  this.isFinish = () => {
+    return type == BattleTaskType.finish;
+  };
+
+  if (type == BattleTaskType.finish) { return; }
+  this.attack = new BattleAttack(player, enemy);
+};
 
 /////////////////////////
 // 攻撃

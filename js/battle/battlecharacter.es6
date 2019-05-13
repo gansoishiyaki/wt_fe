@@ -142,6 +142,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
   initialize: function(chara, enemy) {
     BattleChara.call(this, chara, enemy);
 
+    this.data = Chara.hyrein;
     this.size = {width: 52, height: 58};
     this.main(this.size);
   },
@@ -158,7 +159,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
     var bards = [];
     var bard = () => {
       var bard = new Sprite(30, 30);
-      bard.image = game.assets[this.chara.data.images.bard];
+      bard.image = game.assets[this.data.images.bard];
       bard.frame = random(3);
       bard.x = this.sprite.x + 25 + random(40);
       bard.y = this.sprite.y + random(-60, 40);
