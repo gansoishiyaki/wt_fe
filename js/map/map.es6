@@ -13,6 +13,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
    */
   initialize: function(data) {
     enchant.Scene.call(this);
+    this.removeAll();
+    this.charas = [];
 
     this.data = data;
 
@@ -47,7 +49,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.addChild(this.menu);
 
     // 敵の表示
-    data.enemies.map(enemy => {
+    data.enemies.forEach(enemy => {
       var chara = new MapCharactor(enemy.chara, CampType.enemy);
       // 位置
       chara.setPos(new Pos(enemy.x, enemy.y));
@@ -57,18 +59,16 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
       this.field.addChild(chara);
       this.charas.push(chara);
-      return chara;
     });
 
     // 味方の表示
-    data.players.map((player, i) => {
+    data.players.forEach((player, i) => {
       if (party[i] == undefined) {return;}
       
       var chara = new MapCharactor(party[i]);
       chara.setPos(new Pos(player.x, player.y));
       this.field.addChild(chara);
       this.charas.push(chara);
-      return chara;
     });
 
     this.field.on(Event.TOUCH_END, e => {
@@ -179,7 +179,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       target_pos = target.pos;
     }
 
-    var moves = this.calApploach(enemy.pos, target_pos);;
+    var moves = this.calApploach(enemy.pos, target_pos, enemy);
+    console.log(moves);
 
     // 移動終了
     let moved = () => {
@@ -236,12 +237,12 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     if (this.players().length == 0) {
       // 敗北
       console.log("敗北");
-      postTwitter(`負けてしまった・・・`);
+      scenes.battleResult.setScene(false);
       return;
     } else if (this.enemies().length == 0) {
       // 勝利
       console.log("勝利");
-      postTwitter(`買った!!`);
+      scenes.battleResult.setScene(true);
       return;
     }
 
@@ -314,7 +315,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 範囲表示
     let moves = this.calRange(chara.pos, chara.getMove(), chara);
     var attacks = chara.calAttackRange(moves);
-    attacks = attacks.filter(pos => !this.hitCol(pos) && !this.hi(pos, chara));
+    attacks = attacks.filter(pos => !this.hitCol(pos) && !this.hitChara(pos, chara));
     this.ranges.set_ranges(moves, attacks);
 
     // 半透明の移動先表示
@@ -682,13 +683,10 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   hitChara: function(pos, chara) {
     if (!chara) {return false;}
 
-    for (var target of this.charas) {
-      if (!chara.isCampEqual(target) && pos.equal(target.pos)) {
-        return target;
-      }
-    }
+    let target = this.otherCampCharas(chara.camp)
+                     .find(c => c.pos.equal(pos));
 
-    return false;
+    return target != undefined ? target : false;
   },
 
   /**

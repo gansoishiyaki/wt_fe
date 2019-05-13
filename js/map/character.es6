@@ -113,7 +113,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   // 行動終了
   moved: function() {
     this.move_flag = true;
-    this.main.main.opacity = 0.5;
+    this.main.main.setGrayImage();
 
     // ターン終了チェック
     scenes.map.checkTurn();

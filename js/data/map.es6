@@ -27,6 +27,7 @@ let RoutineType = {
 
 let Maps = {
   test: {
+    name: "テストマップ",
     chip: MapStatus.test,
     data: [[
       [12,12,12,12,12,12],
@@ -63,7 +64,7 @@ let Maps = {
       routine: RoutineType.none,
     },],
     players: [
-      {x: 3, y: 5},
+      {x: 3, y: 2},
       {x: 2, y: 5}
     ],
   },

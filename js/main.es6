@@ -16,6 +16,7 @@ window.onload = () => {
     scenes.status = new StatusScene();
     scenes.preBattle = new PreBattleScene();
     scenes.battle = new BattleScene();
+    scenes.battleResult = new BattleResultScene();
     
     game.pushScene(scenes.map);
 
