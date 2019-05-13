@@ -368,6 +368,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 死んだキャラを配列から覗く
     this.charas = this.charas.filter(c => !c.isDead());
 
+    // HPを更新する
+    this.charas.forEach(c => c.gage.setHP());
+
     // キャラクターを行動済みにする
     chara.moved();
 
@@ -461,7 +464,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       let chara = this.selectChara;
       chara.setPos(chara.beforePos);
       this.selectEnd();
-      
+
       // 行動終了ボタン表示
       this.menu.addChild(this.finishButton);
     });
