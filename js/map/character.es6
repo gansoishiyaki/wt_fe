@@ -90,7 +90,6 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
           } else {
             // キャラクターの移動
             map.moveTo(this, map.lastPos);
-            //this.move_flag = true;
           }
           break;
         default:
@@ -100,11 +99,28 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     });
   },
 
+  // ターン開始され、移動可能に
+  canMove: function() {
+    this.move_flag = false;
+    this.main.main.opacity = 1;
+  },
+
+  // 行動終了
+  moved: function() {
+    this.move_flag = true;
+    this.main.main.opacity = 0.5;
+
+    // ターン終了チェック
+    scenes.map.checkTurn();
+  },
+
   // 本体の画像取得
   mainSprite: function() {
     var group = new Group();
-    var sprite = new Sprite(CHIP_SIZE, CHIP_SIZE);
-    sprite.image = game.assets[`img/chara/map/${this.data.id}.png`];
+    //var sprite = new Sprite(40,40);
+    var sprite = new FSprite({width: CHIP_SIZE, height: CHIP_SIZE});
+    //sprite.image = game.assets[`img/chara/map/${this.data.id}.png`];
+    sprite.setImage(`img/chara/map/${this.data.id}.png`);
     group.main = sprite;
     group.addChild(sprite);
 

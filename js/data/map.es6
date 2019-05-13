@@ -21,6 +21,10 @@ let MapStatus = {
   }
 };
 
+let RoutineType = {
+  none: 0, // 猪突猛進
+};
+
 let Maps = {
   test: {
     chip: MapStatus.test,
@@ -55,7 +59,8 @@ let Maps = {
     enemies: [{
       chara: Chara.hyrein,
       x: 3,
-      y: 1
+      y: 1,
+      routine: RoutineType.none,
     },],
     players: [
       {x: 4, y: 2},

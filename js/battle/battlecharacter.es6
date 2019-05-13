@@ -65,6 +65,12 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     // 左右反転
     if (this.is_flip) { number.flip();}
 
+    // クリティカル表記
+    if (this.is_critical) { 
+      number.scaleX *= 1.5;
+      number.scaleY *= 1.5
+    }
+
     // ゲージを減らす
     this.chara.battleGage.damage(attack);
 

@@ -11,12 +11,17 @@ window.onload = () => {
   preload();
   game.onload = () => {
     // map表示
+    scenes.changeTurn = new TurnChangeScene();
     scenes.map = new MapScene(Maps.test);
     scenes.status = new StatusScene();
     scenes.preBattle = new PreBattleScene();
     scenes.battle = new BattleScene();
     
     game.pushScene(scenes.map);
+
+    scenes.map.tl.delay(10).then(() => {
+      scenes.changeTurn.setScene(CampType.party);
+    });
   };
 
   game.start();
@@ -33,7 +38,12 @@ window.onload = () => {
       'img/system/numbers.png',
       'img/system/numbersyellow.png',
       'img/system/mini_status.png',
-      'img/system/enemy_mini_status.png')
+      'img/system/enemy_mini_status.png',
+      'img/system/player_turn.png',
+      'img/system/enemy_turn.png',
+      'img/system/player_turn_bar.png',
+      'img/system/enemy_turn_bar.png',
+    )
 
     // party
     party.forEach(chara => {

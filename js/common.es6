@@ -55,6 +55,12 @@ let TouchMode = {
   attack: 3
 }
 
+let TurnType = {
+  ready: -1,
+  player: -0,
+  enemy: 1
+}
+
 let FPS = 20;
 
 var Common = {

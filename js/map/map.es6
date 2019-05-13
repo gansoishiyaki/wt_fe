@@ -2,7 +2,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   selectChara: null,
   selectAttack: null,
   localPos: null,
-  touchMode: TouchMode.none,
+  touchMode: TouchMode.disable,
+  turn: TurnType.ready, 
   charas: [],
   deadCharas: [],
 
@@ -73,7 +74,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
         }
       }
 
+      let selectChara = this.selectChara;
       this.selectEnd();
+      selectChara.moved();
     });
 
     // カーソル移動時
@@ -98,6 +101,62 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       this.lastPos = pos;
       this.movePreSprite(pos);
     });
+  },
+
+  // 敵のターン
+  enemyTurn: function() {
+    this.enemies().forEach(e => e.moved());
+  },
+
+  // 味方の状況、敵の状況をチェックして
+  // ターン遷移を確認する
+  checkTurn: function() {
+    // 勝利か敗北チェック
+    if (this.players().length == 0) {
+      // 敗北
+      console.log("敗北");
+    } else if (this.enemies().length == 0) {
+      // 勝利
+      console.log("勝利");
+    }
+
+    // ターン終了かチェック
+    switch(this.turn) {
+      case TurnType.player:
+        // 全員行動済みか 
+        if (this.players().filter(player => !player.move_flag).length == 0) {
+          this.charas.forEach(c => c.canMove());
+          scenes.changeTurn.setScene(CampType.enemy);
+        }
+      break;
+      case TurnType.enemy:
+        // 全員行動済みか 
+        if (this.enemies().filter(enemy => !enemy.move_flag).length == 0) {
+          this.charas.forEach(c => c.canMove());
+          scenes.changeTurn.setScene(CampType.party);
+        }
+      break;
+    }
+  },
+
+  next: function() {
+    switch(this.turn) {
+      case TurnType.ready:
+      this.touchMode = TouchMode.none;
+      this.turn = TurnType.player;
+      break;
+      
+      case TurnType.player:
+      this.TouchMode = TouchMode.disable;
+      this.turn = TurnType.enemy;
+      this.enemyTurn();
+      break;
+
+      case TurnType.enemy:
+      this.touchMode = TouchMode.none;
+      this.turn = TurnType.player;
+      break;
+    }
   },
 
   isContainAttackRange(chara, pos) {
@@ -191,7 +250,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     this.charas = this.charas.filter(c => !c.isDead());
 
     // キャラクターを行動済みにする
-    // this.chara.move_flag = true;
+    chara.moved();
 
     // 選択終了
     this.selectEnd();

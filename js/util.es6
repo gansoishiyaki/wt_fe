@@ -38,6 +38,47 @@ var Pos = function(x = 0, y = 0){
   }
 }
 
+// カスタム画像クラス
+var FSprite = enchant.Class.create(enchant.Sprite, {
+  initialize: function(size){
+    enchant.Sprite.call(this, size.width, size.height);
+    this.size = size;
+  },
+
+  setImage: function(filename) {
+    this.assetfile = game.assets[filename];
+    this.image = this.assetfile;
+  },
+
+  setGtayImage: function() {
+    this.sur = new Surface(this.size.width, this.size.height);
+    this.sur.draw(this.assetfile, 0, 0, this.size.width, this.size.height);
+    
+    for (var i=0; i < this.size.width; ++i) {
+	    for (var j=0; j< this.size.height; ++j) {
+        var p = this.sur.getPixel(j, i);
+        // グレイスケールを求める
+        var grayscale = p[0]*0.3 + p[1]*0.59 + p[2]*0.11;
+        p[0] = grayscale;
+        p[1] = grayscale;
+        p[2] = grayscale;
+        // ピクセルセット
+        this.sur.setPixel(j, i, p[0], p[1], p[2], p[3]);
+      }
+    }
+
+    this.image = this.sur;
+  },
+
+  alignCenter: function() {
+    this.x = this.x - this.size.width / 2;
+  },
+
+  alignRight: function() {
+    this.x = this.x - this.size.width;
+  },
+});
+
 var FLabel = enchant.Class.create(enchant.Group, {
   initialize: function(str, fontsize, x, y) {
     enchant.Group.call(this);
@@ -141,6 +182,10 @@ var CustomNumbers = enchant.Class.create(enchant.Group, {
     });
 
     this.str_width = str.length * (this.width - 1);
+  },
+
+  alignCenter: function() {
+    this.x = this.x - this.main._boundWidth / 2;
   },
 
   alignRight: function() {
