@@ -337,9 +337,9 @@ var MiniGage = enchant.Class.create(enchant.Group, {
     this.gage.addChild(this.gage.base);
     this.addChild(this.gage);
 
-    let main_height = this.gage_height - this.line * 2;
-    let main_width = this.gage_width - this.line * 2;
-    this.gage.main = new GradSquare(main_width, main_height, {start: "white", end: this.chara.getColor()});
+    this.main_height = this.gage_height - this.line * 2;
+    this.main_width = this.gage_width - this.line * 2;
+    this.gage.main = new GradSquare(this.main_width, this.main_height, {start: "white", end: this.chara.getColor()});
     this.gage.main.x = this.line;
     this.gage.main.y = this.line;
     this.gage.addChild(this.gage.main);
@@ -351,6 +351,7 @@ var MiniGage = enchant.Class.create(enchant.Group, {
   setHP: function() {
     // ゲージ
     this.gage.main.scaleX = this.chara.hp / this.chara.maxhp; 
+    this.gage.main.x = 1 - this.main_width * (this.chara.maxhp -this.chara.hp) / this.chara.maxhp / 2;
 
     // 表示HP
     if (this.hp_sprite) {this.removeChild(this.hp_sprite);}

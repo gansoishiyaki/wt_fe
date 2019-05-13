@@ -243,6 +243,7 @@ var Square = enchant.Class.create(enchant.Sprite, {
 var GradSquare = enchant.Class.create(enchant.Sprite, {
   initialize: function(width, height, colors = {start: "whire", end: "black"}) {
     enchant.Sprite.call(this, width, height);
+    this.colors = colors;
 
     var sur = new Surface(width, height);
     this.image = sur;
@@ -250,6 +251,18 @@ var GradSquare = enchant.Class.create(enchant.Sprite, {
     var grad = sur.context.createLinearGradient(0, 0, 0, height);
     grad.addColorStop(0, colors.start);
     grad.addColorStop(1, colors.end);
+    
+    sur.context.fillStyle = grad;
+    sur.context.fillRect(0, 0, width, height);
+  },
+
+  reSize: function(width, height) {
+    var sur = new Surface(width, height);
+    this.image = sur;
+
+    var grad = sur.context.createLinearGradient(0, 0, 0, height);
+    grad.addColorStop(0, this.colors.start);
+    grad.addColorStop(1, this.colors.end);
     
     sur.context.fillStyle = grad;
     sur.context.fillRect(0, 0, width, height);

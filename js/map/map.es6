@@ -313,8 +313,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 範囲表示
     let moves = this.calRange(chara.pos, chara.getMove(), chara);
+    attacks = moves.filter(pos => !this.hitChara(pos, chara));
     var attacks = chara.calAttackRange(moves);
-    attacks = attacks.filter(pos => !this.hitCol(pos) && !this.hitChara(pos, chara));
+    attacks = attacks.filter(pos => !this.hitCol(pos));
     this.ranges.set_ranges(moves, attacks);
 
     // 半透明の移動先表示
