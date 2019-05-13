@@ -93,8 +93,8 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
         num_str = "yellow";
       }
 
-      var gage_base = new Gage("gagebase", margin_left, height + 3, gage_base_width, GAGE);
-      var gage = new Gage(gage_str, margin_left, height + 3, gage_width, GAGE);
+      var gage_base = new Gage("gagebase", margin_left, height + 3, gage_base_width, FILESIZE.gage);
+      var gage = new Gage(gage_str, margin_left, height + 3, gage_width, FILESIZE.gage);
       this.status.addChild(gage_base);
       this.status.addChild(gage);
 

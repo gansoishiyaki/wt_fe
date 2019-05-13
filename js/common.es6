@@ -6,7 +6,6 @@ let CHIP_SIZE = 40;
 
 // マップは6*8
 let MAP = {width: 6, height: 8};
-let GAGE = {width: 4, height: 6};
 
 // メニュー用に上に2, 下に1マス分とる
 let WINDOW = {
@@ -15,10 +14,8 @@ let WINDOW = {
 };
 
 let FILESIZE = {
-  button: {
-    width: 25,
-    height: 33
-  },
+  button: { width: 25,　height: 33},
+  gage: { width: 4, height: 6},
 };
 
 let COLOR = {

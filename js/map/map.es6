@@ -785,8 +785,8 @@ var MiniStatus = enchant.Class.create(enchant.Group, {
     // ゲージ表示
     let gage_hp_base_width = WINDOW.width - this.margin * 2;
     let gage_hp_width = chara.hp / chara.maxhp * gage_hp_base_width;
-    this.addChild(new Gage("gagebase", this.margin, 12, gage_hp_base_width, GAGE));
-    this.addChild(new Gage("gagegreen", this.margin, 12, gage_hp_width, GAGE));
+    this.addChild(new Gage("gagebase", this.margin, 12, gage_hp_base_width, FILESIZE.gage));
+    this.addChild(new Gage("gagegreen", this.margin, 12, gage_hp_width, FILESIZE.gage));
 
     // 名前表示
     this.name_text = new FLabel(chara.data.name, 13, this.margin, this.margin);
