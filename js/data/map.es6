@@ -59,12 +59,12 @@ let Maps = {
     ]],
     enemies: [{
       chara: Chara.hyrein,
-      x: 2,
-      y: 3,
+      x: 3,
+      y: 1,
       routine: RoutineType.none,
     },],
     players: [
-      {x: 2, y: 5},
+      {x: 3, y: 5},
       {x: 2, y: 5}
     ],
   },
