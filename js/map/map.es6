@@ -610,7 +610,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       // 味方陣営とぶつからないようにする
       let sameCampCharas = this.sameCampCharas(chara.camp);
       move_range = move_range.filter(p => {
-        return sameCampCharas.find(c => c.pos.equal(p)) == undefined;
+        return sameCampCharas.filter(c => c !== chara).find(c => c.pos.equal(p)) == undefined;
       });
     }
 
