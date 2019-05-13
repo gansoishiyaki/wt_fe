@@ -269,14 +269,14 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
       };
     });
 
-    // その攻撃で死んだ場合
-    if (this.chara.isDead()) {
-
-    }
-
-    let tl = this.tl.cue(cue).delay(10).then(() => {
-      attack.finish();
-    });
+    this.tl.cue(cue)
+      .then(() => {
+        //その攻撃で死んだ場合
+        if (this.chara.isDead()) { attack.chara.battle.dead(); }
+      }).delay(10).then(() => {
+        // 攻撃終了のcallback
+        attack.finish();
+      });
   },
 
   setHP: function(hp) {

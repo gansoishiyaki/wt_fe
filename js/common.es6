@@ -7,17 +7,18 @@ let CHIP_SIZE = 40;
 // マップは6*8
 let MAP = {width: 6, height: 8};
 let GAGE = {width: 4, height: 6};
-let BUTTON = {
-  size: {
-    width: 25,
-    height: 33
-  },
-};
 
 // メニュー用に上に2, 下に1マス分とる
 let WINDOW = {
   width: CHIP_SIZE * MAP.width,
   height: CHIP_SIZE * (MAP.height + 2 + 1),
+};
+
+let FILESIZE = {
+  button: {
+    width: 25,
+    height: 33
+  },
 };
 
 let COLOR = {
@@ -81,7 +82,7 @@ var Common = {
 
 var FButton = enchant.Class.create(Gage, {
   initialize: function(str, x, y, width, filename = "button") {
-    Gage.call(this, filename, x, y, width, BUTTON.size);
+    Gage.call(this, filename, x, y, width, FILESIZE.button);
 
     this.str = new FLabel(str, 14, width / 2 + 3, 10);
     this.str.setShadow();

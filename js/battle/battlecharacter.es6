@@ -68,7 +68,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     }
 
     this.frame(0);
-    this._damage();
+    this._damage(attack);
   },
   _damage: function(attack) {
     // 被ダメージシェイク
@@ -225,22 +225,20 @@ var Hyrein = enchant.Class.create(BattleChara, {
       };
     };
 
-    //攻撃終了か
-    var damaged = attack.is_hit ? false : true;
-    var attacked = false;
+    // ダメージ処理が終了していれば呼ばれる
+    var damaged = !attack.is_hit;
     attack.finish = () => {
       damaged = true;
       process_end();
     };
 
-
+    //攻撃終了か
+    var attacked = false;
     this.sprite.tl.cue(cue).delay(10)
     .then(() => {
       this.frame(0);
       attacked = true;
       process_end();
     });
-
-    
   },
 });
