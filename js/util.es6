@@ -205,6 +205,18 @@ var CustomNumbers = enchant.Class.create(enchant.Group, {
   },
 });
 
+/**
+ * ## tweetScore 
+ * @param msg ツイート内容
+ */
+function tweetMsg(msg) {
+  let url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(msg)}`;
+  
+  if(!window.open(url, '_blank')) {
+    location.href = url;
+  }
+}
+
 var Square = enchant.Class.create(enchant.Sprite, {
   initialize: function(width, height, color = "black") {
     enchant.Sprite.call(this, width, height);

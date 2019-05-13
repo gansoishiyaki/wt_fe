@@ -106,6 +106,15 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       this.lastPos = pos;
       this.movePreSprite(pos);
     });
+
+    // 行動終了ボタン
+    this.finishButton = new FButton("行動終了", 130, 3, 100);
+
+    // 行動を終了する
+    this.finishButton.on(Event.TOUCH_END, e => {
+      // 全員行動終了
+      this.charas.filter(c => !c.move_flag).forEach(c => c.moved());
+    });
   },
 
   // 敵のターン
@@ -231,6 +240,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
         if (this.players().filter(player => !player.move_flag).length == 0) {
           this.charas.forEach(c => c.canMove());
           scenes.changeTurn.setScene(CampType.enemy);
+        } else {
+          // 行動終了ボタン表示
+          this.menu.addChild(this.finishButton);
         }
       break;
       case TurnType.enemy:
@@ -248,6 +260,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       case TurnType.ready:
       this.touchMode = TouchMode.none;
       this.turn = TurnType.player;
+      this.menu.addChild(this.finishButton);
       break;
       
       case TurnType.player:
@@ -259,6 +272,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       case TurnType.enemy:
       this.touchMode = TouchMode.none;
       this.turn = TurnType.player;
+      this.menu.addChild(this.finishButton);
       break;
     }
   },
@@ -283,6 +297,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let chara = this.selectChara;
 
     this.touchMode = TouchMode.move;
+    this.menu.removeChild(this.finishButton);
 
     // 範囲表示
     let moves = this.calRange(chara.pos, chara.getMove(), chara);
@@ -446,6 +461,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       let chara = this.selectChara;
       chara.setPos(chara.beforePos);
       this.selectEnd();
+      
+      // 行動終了ボタン表示
+      this.menu.addChild(this.finishButton);
     });
 
     this.touchMode = TouchMode.attack;

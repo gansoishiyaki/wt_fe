@@ -34,6 +34,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     
     this.main.on(Event.TOUCH_START, e => {
       let map = scenes.map;
+      this.is_touch = true;
 
       // キャラ選択中の時は反応しない
       if (map.touchMode != TouchMode.none) { return; }
@@ -50,6 +51,9 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
       // 0.5秒後にtouch判定が消えてなかったらロングタップ判定
       this.timeline = this.tl.delay(FPS).then(() => {
+        if (!this.is_touch) { return; }
+        this.is_touch = false;
+
         if (map.touchMode != TouchMode.single) {return;}
 
         // キャラクターステータス表示
@@ -63,6 +67,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
     this.main.on(Event.TOUCH_END, e => {
       let map = scenes.map;
+      this.is_touch = false;
 
       // タッチモードが何もない場合は終了
       if (map.touchMode == TouchMode.none) {return}
