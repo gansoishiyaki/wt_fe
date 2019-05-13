@@ -138,7 +138,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   // 猪突猛進タイプの思考ルーチン
   enemyActionNormal: function(enemy) {
     // 攻撃範囲内に敵がいるか
-    let charas = this.otherCampCharas(enemy);
+    let charas = this.otherCampCharas(enemy.camp);
     let containChara = this.checkContainAttackRange(enemy, charas);
 
     var move_max = enemy.getMove();
@@ -158,8 +158,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       target_pos = target.pos;
     }
 
-    console.log(`ターゲット x:${target_pos.x} y:${target_pos.y}`);
-
     var moves = this.calApploach(enemy.pos, target_pos);;
 
     // 移動終了
@@ -169,6 +167,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
         scenes.battle.setChara(enemy, target);
       } else {
         // 移動して行動終了　
+        enemy.moved();
         this.finishEnemyAction();
       }
     }
@@ -177,8 +176,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     var i = 1;
     let self = this;
     function move() {
-      // 既に隣接している場合は終了
-      if (enemy.pos.abs(target_pos) <= 0) {
+      // 既に到着している場合は終了
+      if (enemy.pos.equal(target_pos)) {
         self.tl.delay(5).then(moved);
         return;
       }
@@ -197,16 +196,15 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 移動開始
     move();
 
+    console.log(`ターゲット x:${target_pos.x} y:${target_pos.y}`);
     console.log(`${enemy.data.name} target:${target.data.name}`);
   },
 
   // 攻撃範囲内に敵がいるか
   checkContainAttackRange(chara, enemies) {
     // 攻撃範囲内に敵がいるか
-    let range = this.getMoveAndAttackRange(chara);
-    let containChara = enemies.filter(c => {
-      return range.find(p => p.equal(c.pos)) != undefined;
-    });
+    let range = new Range(this.getMoveAndAttackRange(chara));
+    let containChara = enemies.filter(e => range.contain(e.pos));
 
     return containChara;
   },
@@ -214,6 +212,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   // 味方の状況、敵の状況をチェックして
   // ターン遷移を確認する
   checkTurn: function() {
+    console.log('checkTurn');
     // 勝利か敗北チェック
     if (this.players().length == 0) {
       // 敗北
