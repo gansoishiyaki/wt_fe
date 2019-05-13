@@ -38,6 +38,12 @@ var Pos = function(x = 0, y = 0){
   }
 }
 
+var Range = function(range = []) {
+  this.contain = pos => {
+    return range.find(p => p.equal(pos)) != undefined;
+  }
+}
+
 // カスタム画像クラス
 var FSprite = enchant.Class.create(enchant.Sprite, {
   initialize: function(size){

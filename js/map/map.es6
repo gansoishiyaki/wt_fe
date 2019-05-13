@@ -26,7 +26,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     }
 
     // 行動範囲表示
-    this.ranges = new Range(this);
+    this.ranges = new RangeGroup(this);
     this.field.addChild(this.ranges);
 
     this.addChild(this.field);
@@ -145,20 +145,22 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // ターゲット指定
     var target;
+    var target_pos;
     if (containChara.length > 0) {
       // 敵がいる場合は、その中での優先度を決める
       target = enemy.getMostPriority(containChara);
 
-      // 既に攻撃範囲内か
-      if (this.isContainAttackRange(enemy, target.pos)) {
-
-      }
+      let attacks = enemy.calAttackRange([target.pos]);
+      target_pos = this.getMostPriority(enemy, target, attacks); 
     } else {
       // 範囲内に敵がいない場合は、全キャラクターの優先度をチェックする
       target = enemy.getMostPriority(charas);
+      target_pos = target.pos;
     }
 
-    var moves = this.calApploach(enemy.pos, target.pos);;
+    console.log(`ターゲット x:${target_pos.x} y:${target_pos.y}`);
+
+    var moves = this.calApploach(enemy.pos, target_pos);;
 
     // 移動終了
     let moved = () => {
@@ -175,9 +177,15 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     var i = 1;
     let self = this;
     function move() {
-      self.apploach(enemy, target.pos, FPS / 10, moves, result => {
+      // 既に隣接している場合は終了
+      if (enemy.pos.abs(target_pos) <= 0) {
+        self.tl.delay(5).then(moved);
+        return;
+      }
+
+      self.apploach(enemy, target_pos, FPS / 10, moves, result => {
         if (!result || i >= move_max) {
-          self.tl.delay(5).then(() => moved());
+          self.tl.delay(5).then(moved);
           return;
         }
 
@@ -540,7 +548,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     return moves;
   },
 
-  // 移動範囲計算
+  /**
+   * キャラクターの移動範囲計算
+   * @param chara 
+   */
+  calRangeByChara: function(chara) {
+    return this.calRange(chara.pos, chara.getMove(), chara);
+  },
+
+  /**
+   * 移動範囲計算
+   * @param pos 
+   * @param move 
+   * @param chara 
+   */
   calRange: function(pos, move, chara = null) {
     let moves = this.calRangeMoves(pos, move, chara);
     var move_range = [];
@@ -556,6 +577,47 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     return move_range;
   },
 
+  /**
+   * ## getMostPriority
+   * 優先度の高い攻撃位置を取得する
+   * @param chara 攻撃者
+   * @param target ターゲット
+   * @param attacks 攻撃範囲 [Pos]
+   */
+  getMostPriority: function(chara, target, attacks) {
+    // ターゲットの攻撃範囲
+    let target_attacks = target.calAttackRange([target.pos]);
+    let attackRange = new Range(attacks);
+    let moves = new Range(this.calRangeByChara(chara)); 
+
+    var getExpected = (pos) => {
+      var result = 0;
+
+      // 攻撃範囲に入ってる
+      if (moves.contain(pos)) {
+        result = 100;
+
+        // かつ、敵の攻撃範囲に入っていない場合は満点
+        if (!attackRange.contain(pos)) {
+          result += 100;
+        }
+      }
+      return result;
+    };
+
+    return attacks.reduce((a, result) => {
+      let expected = getExpected(a);
+      let result_expected = getExpected(result);
+      return expected > result_expected ? a : result;
+    });
+  },
+
+  /**
+   * ## hitCol
+   * 障害物判定
+   * @param pos 座標
+   * @return {Boolean}
+   */
   hitCol: function(pos) {
     var result = false;
     for (var data of this.data.data) {
@@ -570,7 +632,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     return result;
   },
 
-  // 別陣営のキャラクターにヒットするか
+  /**
+   * ## hitChara
+   * 別陣営のキャラクターにHitするか
+   * @param {Pos} pos 
+   * @param {Character} chara 
+   * @return {Boolean}
+   */
   hitChara: function(pos, chara) {
     if (!chara) {return false;}
 
@@ -583,16 +651,31 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     return false;
   },
 
+  /**
+   * ## sameCmapCharas
+   * 同じ陣営のキャラを取得する
+   * @param {CampType} camp 陣営
+   * @return {[Character]} キャラクター
+   */
   sameCampCharas: function(camp) {
     return this.charas.filter(c => c.camp == camp);
   },
 
+  /**
+   * ## otherCampCharas 
+   * 違う陣営のキャラを取得する
+   * @param {CampType} camp 陣営
+   * @return {[Character]} キャラクター
+   */
   otherCampCharas: function(camp) {
     return this.charas.filter(c => c.camp != camp);
   },
 });
 
-var Range = enchant.Class.create(enchant.Group, {
+/**
+ * @constructor
+ */
+var RangeGroup = enchant.Class.create(enchant.Group, {
   moves: [],
   attack: [],
 

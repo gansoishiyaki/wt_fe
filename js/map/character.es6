@@ -288,7 +288,8 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   getMostPriority: function(charas) {
     return charas.reduce((c, result) => {
       let expected = this.getExpected(c);
-      return expected > result ? expected : result;
+      let result_expected = this.getExpected(result);
+      return expected > result_expected ? c : result;
     });
   },
 
