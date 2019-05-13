@@ -43,9 +43,10 @@ var TurnChangeScene = enchant.Class.create(enchant.Scene, {
 
     // 文字のアニメーション
     main.tl
-      .scaleTo(1, 1, FPS / 4, enchant.Easing.QUAD_EASEINOUT)
-      .delay(10)
-      .scaleTo(1, 0, FPS / 4, enchant.Easing.QUAD_EASEINOUT)
+      .scaleTo(1, 1, 5, enchant.Easing.QUAD_EASEINOUT)
+      .delay(15)
+      .scaleTo(1, 0, 5, enchant.Easing.QUAD_EASEINOUT)
+      .delay(5)
       .then(() => {
         game.popScene(this);
         scenes.map.next();

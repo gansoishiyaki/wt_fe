@@ -62,7 +62,7 @@ let TurnType = {
   enemy: 1
 }
 
-let FPS = 20;
+let FPS = 30;
 
 var Common = {
   // マップサイズ分の空の配列を提供する
