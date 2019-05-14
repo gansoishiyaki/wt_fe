@@ -429,13 +429,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   moveTo: function(chara, pos) {
     let moves = this.calApploach(chara.pos, pos);
-    let time = FPS / 10;
+    let time = 2;
     this.touchMode = TouchMode.disable;
 
     // 移動完了
     var finish = () => {
       // 少しdelayをかけたのち攻撃モードへ
-      this.tl.delay(FPS / 4)
+      this.tl.delay(4)
         .then(() => { this.setAttackMode(chara); });
     }
 
@@ -526,6 +526,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let moveBy = direction.multi(CHIP_SIZE);
     chara.pos = chara.pos.add(direction);
     chara.tl.moveBy(moveBy.x, moveBy.y, time).then(() => {
+      console.log(direction);
       // callbackをよぶ
       if (func) { func(true);}
     });
