@@ -180,6 +180,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     }
 
     var moves = this.calApploach(enemy.pos, target_pos, enemy);
+    console.log(moves);
 
     // 移動終了
     let moved = () => {
@@ -203,7 +204,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
         return;
       }
 
-      self.apploach(enemy, target_pos, FPS / 10, moves, result => {
+      self.apploach(enemy, target_pos, 2, moves, result => {
         if (!result || i >= move_max) {
           self.tl.delay(5).then(moved);
           return;

@@ -119,6 +119,28 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     str.tl.moveBy(0, -10, 3).moveBy(0, 5, 3).delay(10).removeFromScene();
   },
 
+  /**
+   * ## regist
+   * 攻撃無効 or 0 damage
+   */
+  regist: function() {
+    this.frame(0);
+    this._regist();
+  },
+  _regist: function() {
+    // ガードの表記
+    let pos = this.sprite.getCenterPos(); 
+    let str = new FLabel("Guard!", 14, pos.x, pos.y - 40);
+    str.setShadow();
+    this.addChild(str);
+
+    // 左右反転
+    if (this.is_flip) { str.flip();}
+
+    str.tl.moveBy(0, -10, 3).moveBy(0, 5, 3).delay(10).removeFromScene();
+
+  },
+
   dead: function() {},
 });
 

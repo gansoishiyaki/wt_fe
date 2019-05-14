@@ -146,6 +146,10 @@ var BattleAttack = function(chara, enemy) {
   this.chara = chara;
   this.enemy = enemy;
 
+  // 発動したスキル
+  this.chara_exec = [];
+  this.enemy_exec = [];
+
   // 命中判定
   let hit = chara.getHit(enemy);
   this.is_hit = random(100) <= hit;
