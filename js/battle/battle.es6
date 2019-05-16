@@ -307,11 +307,13 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
       };
     });
 
+    var delay = attack.enemy.isDead ? 30 : 10;
+
     this.tl.cue(cue)
       .then(() => {
         //その攻撃で死んだ場合
-        if (this.chara.isDead()) { attack.chara.battle.dead(); }
-      }).delay(10).then(() => {
+        if (attack.enemy.isDead()) { attack.enemy.battle.dead(); }
+      }).delay(delay).then(() => {
         // 攻撃終了のcallback
         attack.finish();
       });

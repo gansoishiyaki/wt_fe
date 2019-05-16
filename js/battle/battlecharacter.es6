@@ -7,6 +7,9 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   is_flip: false,
   attacked: false,
   damaged: false,
+  avoid_frame: 0,
+  damaged_frame: 0,
+  dead_frame: 0,
   callback: () => {},
   initialize: function(chara, enemy) {
     enchant.Group.call(this);
@@ -72,7 +75,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       return;
     }
 
-    this.frame(0);
+    this.frame(this.damaged_frame);
     this._damage(attack);
   },
   _damage: function(attack) {
@@ -120,7 +123,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * 回避 共通関数
    */
   avoid: function(attack) {
-    this.frame(0);
+    this.frame(this.avoid_frame);
     attack.finish();
     this._avoid();
   },
@@ -160,7 +163,9 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
   },
 
-  dead: function() {},
+  dead: function() {
+    this.frame(this.dead_frame);
+  },
 
   exec: function(cue) {
     //攻撃終了か
@@ -208,6 +213,8 @@ var BattleCharaSprite = enchant.Class.create(enchant.Group, {
 
 var Hyrein = enchant.Class.create(BattleChara, {
   bards: [],
+  damaged_frame: 17,
+  dead_frame: 18,
   initialize: function(chara, enemy) {
     BattleChara.call(this, chara, enemy);
 
@@ -225,6 +232,11 @@ var Hyrein = enchant.Class.create(BattleChara, {
     this.setDamageEnd(attack);
 
     this.bards = [];
+
+    if (attack) {
+      // 相手の構えを元に戻す
+      attack.enemy.battle.frame(0);
+    }
 
     if (attack && attack.is_critical) {
       this.critical(attack, callback);
