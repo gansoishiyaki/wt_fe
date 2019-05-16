@@ -13,7 +13,11 @@ let SkillTarget = {
   all: 3
 }
 
-let Skill = {
+var Skill = function(skill) {
+  Object.assign(this, skill);
+}
+
+let SkillData = {
   alektor: {
     name: "キューブ化",
     description: "相手の防御力を半減して攻撃する",
@@ -30,7 +34,7 @@ let Skill = {
     target: SkillTarget.enemy,
     exec: attack => {
       // 技%で発動
-      return attack.chara.getTeh(attack.enemy);
+      attack.chara.getTeh(attack.enemy);
     },
   },
 

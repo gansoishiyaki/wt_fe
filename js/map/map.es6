@@ -526,7 +526,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let moveBy = direction.multi(CHIP_SIZE);
     chara.pos = chara.pos.add(direction);
     chara.tl.moveBy(moveBy.x, moveBy.y, time).then(() => {
-      console.log(direction);
       // callbackをよぶ
       if (func) { func(true);}
     });

@@ -23,11 +23,11 @@ let Chara = {
     neighbor: true,
     main_trigger: Trigger.alektor,
     skills: [
-      Skill.alektor, 
-      Skill.alektor_drain, 
-      Skill.alektor_guard, 
-      Skill.rensoku, 
-      Skill.karisuma
+      SkillData.alektor, 
+      SkillData.alektor_drain, 
+      SkillData.alektor_guard, 
+      SkillData.rensoku, 
+      SkillData.karisuma
     ],
     images: {
       bard: "img/battle/bard.png"

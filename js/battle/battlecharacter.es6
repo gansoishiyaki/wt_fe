@@ -63,7 +63,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   damage: function(attack) {
     // 攻撃が当たっていない場合は回避へ
     if (!attack.is_hit) {
-      this.avoid();
+      this.avoid(attack);
       return;
     }
 
@@ -102,11 +102,12 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * ## avoid
    * 回避 共通関数
    */
-  avoid: function() {
+  avoid: function(attack) {
     this.frame(0);
+    attack.finish();
     this._avoid();
   },
-  _avoid: function() {
+  _avoid: function(attack) {
     // missの表記
     let pos = this.sprite.getCenterPos(); 
     let str = new FLabel("Miss!", 14, pos.x, pos.y - 40);
@@ -123,11 +124,12 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * ## regist
    * 攻撃無効 or 0 damage
    */
-  regist: function() {
+  regist: function(attack) {
     this.frame(0);
+    attack.finish();
     this._regist();
   },
-  _regist: function() {
+  _regist: function(attack) {
     // ガードの表記
     let pos = this.sprite.getCenterPos(); 
     let str = new FLabel("Guard!", 14, pos.x, pos.y - 40);
@@ -165,7 +167,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
     BattleChara.call(this, chara, enemy);
 
     this.data = Chara.hyrein;
-    this.size = {width: 52, height: 58};
+    this.size = {width: 60, height: 58};
     this.main(this.size);
   },
 
@@ -201,7 +203,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
     //マントバサバサ && 鳥さん飛ばす
     var frame = 12;
-    let basa = 2;
+    let basa = 3;
     [...Array(6)].forEach(a => {
       cue[frame] = () => { this.frame(2); bard(); bard(); bard(); bard(); bard(); };
       frame += basa;
@@ -219,7 +221,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
     // 目標地点
     var target = this.getEnemyPos();
     target.x = - 50;
-    cue[frame] = () => {
+    cue[frame + 1] = () => {
       bards.forEach(bard => {
         // ふわっと移動させて画面から消す
         bard.tl
@@ -228,9 +230,23 @@ var Hyrein = enchant.Class.create(BattleChara, {
       });
     };
 
-    cue[frame + 26] = () => {
-      this.enemy.battle.damage(attack);
-    };
+    // ダメージフラグ
+    var damaged = true;
+
+    // attack処理があれば
+    if (attack) {
+      // ダメージ処理
+      cue[frame + 28] = () => {
+        this.enemy.battle.damage(attack);
+      };
+
+      // ダメージ処理が終了していれば呼ばれる
+      damaged = false;
+      attack.finish = () => {
+        damaged = true;
+        process_end();
+      };
+    }
 
     // 再びバサバサ
     frame += 5;
@@ -246,13 +262,6 @@ var Hyrein = enchant.Class.create(BattleChara, {
       if (attacked && damaged) {
         callback();
       };
-    };
-
-    // ダメージ処理が終了していれば呼ばれる
-    var damaged = !attack.is_hit;
-    attack.finish = () => {
-      damaged = true;
-      process_end();
     };
 
     //攻撃終了か
