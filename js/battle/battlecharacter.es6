@@ -5,6 +5,9 @@
 var BattleChara = enchant.Class.create(enchant.Group, {
   height: CHIP_SIZE * 3 - 10,
   is_flip: false,
+  attacked: false,
+  damaged: false,
+  callback: () => {},
   initialize: function(chara, enemy) {
     enchant.Group.call(this);
 
@@ -61,6 +64,8 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * @param {BattleAttack} attack 攻撃情報
    */
   damage: function(attack) {
+    if(!attack) { return; }
+
     // 攻撃が当たっていない場合は回避へ
     if (!attack.is_hit) {
       this.avoid(attack);
@@ -73,9 +78,21 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   _damage: function(attack) {
     // 被ダメージシェイク
     let tl = this.sprite.tl;
+    let shake = attack.is_critical ? 8 : 4;
     [...Array(4)].forEach((a, i) => {
-      tl = tl.moveBy(random(4, 2), 0, 1).moveBy(random(4, 2) * -1, 0, 1);
+      tl = tl.moveBy(random(shake, 2), 0, 1).moveBy(random(shake, 2) * -1, 0, 1);
     });
+
+    if (attack.is_critical) {
+      // クリティカルの場合は画面もシェイク
+      let etl = attack.enemy.battle.window.tl;
+      let y = attack.enemy.battle.window.y; 
+
+      [...Array(6)].forEach((a, i) => {
+        etl = etl.moveBy(0, random(8, 2), 1).moveBy(0, random(8, 2) * -1, 1);
+      });
+      etl = etl.then(() => { attack.enemy.battle.window.y = y; });
+    }
 
     // ダメージの数字
     let pos = this.sprite.getCenterPos();
@@ -144,6 +161,33 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   },
 
   dead: function() {},
+
+  exec: function(cue) {
+    //攻撃終了か
+    this.sprite.tl.cue(cue).delay(10)
+    .then(() => {
+      this.frame(0);
+      this.attacked = true;
+      this.process_end();
+    }); 
+  },
+
+  process_end: function() {
+    if (this.attacked && this.damaged) {
+      this.callback();
+    };
+  },
+
+  setDamageEnd: function(attack) {
+    if (!attack) { return; }
+    // ダメージ処理が終了していれば呼ばれる
+
+    this.damaged = false;
+    attack.finish = () => {
+      this.damaged = true;
+      this.process_end();
+    };
+  },
 });
 
 var BattleCharaSprite = enchant.Class.create(enchant.Group, {
@@ -163,6 +207,7 @@ var BattleCharaSprite = enchant.Class.create(enchant.Group, {
 });
 
 var Hyrein = enchant.Class.create(BattleChara, {
+  bards: [],
   initialize: function(chara, enemy) {
     BattleChara.call(this, chara, enemy);
 
@@ -174,40 +219,30 @@ var Hyrein = enchant.Class.create(BattleChara, {
   attack: function(attack, callback) {
     // 最前面に配置
     this.frontMost();
+    this.damaged = true;
+    this.attacked = false;
+    this.callback = callback;
+    this.setDamageEnd(attack);
+
+    this.bards = [];
+
+    if (attack && attack.is_critical) {
+      this.critical(attack, callback);
+      return;
+    }
 
     // 構える
     var cue = {
       5: () => { this.frame(1) }
     };
 
-    var bards = [];
-    var bard = () => {
-      var bard = new Sprite(30, 30);
-      bard.image = game.assets[this.data.images.bard];
-      bard.frame = random(3);
-      bard.x = this.sprite.x + 25 + random(40);
-      bard.y = this.sprite.y + random(-60, 40);
-      bard.scaleX = 0.5;
-      bard.scaleY = 0.5;
-      this.addChild(bard);
-      bards.push(bard);
-
-      bard.tl.delay(3).then(() => {
-        bard.frame = random(3);
-      }).loop();
-      bard.tl
-        .moveBy(0, 3, 10, enchant.Easing.QUAD_EASEINOUT)
-        .moveBy(0, -3, 10, enchant.Easing.QUAD_EASEINOUT)
-        .loop();
-    };
-
     //マントバサバサ && 鳥さん飛ばす
     var frame = 12;
     let basa = 3;
     [...Array(6)].forEach(a => {
-      cue[frame] = () => { this.frame(2); bard(); bard(); bard(); bard(); bard(); };
+      cue[frame] = () => { this.frame(2); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
       frame += basa;
-      cue[frame] = () => { this.frame(3); bard(); bard(); bard(); bard(); bard(); };
+      cue[frame] = () => { this.frame(3); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
       frame += basa;
     });
 
@@ -219,34 +254,12 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
     // 鳥さんを敵に飛ばす
     // 目標地点
-    var target = this.getEnemyPos();
-    target.x = - 50;
-    cue[frame + 1] = () => {
-      bards.forEach(bard => {
-        // ふわっと移動させて画面から消す
-        bard.tl
-          .moveTo(target.x, target.y, 15, enchant.Easing.QUAD_EASEINOUT)
-          .removeFromScene();
-      });
+    cue[frame + 1] = () => { this.moveBard(); }; 
+
+    // ダメージ処理
+    cue[frame + 28] = () => {
+      this.enemy.battle.damage(attack);
     };
-
-    // ダメージフラグ
-    var damaged = true;
-
-    // attack処理があれば
-    if (attack) {
-      // ダメージ処理
-      cue[frame + 28] = () => {
-        this.enemy.battle.damage(attack);
-      };
-
-      // ダメージ処理が終了していれば呼ばれる
-      damaged = false;
-      attack.finish = () => {
-        damaged = true;
-        process_end();
-      };
-    }
 
     // 再びバサバサ
     frame += 5;
@@ -257,20 +270,92 @@ var Hyrein = enchant.Class.create(BattleChara, {
       frame += basa;
     });
 
-    // ダメージと攻撃判定両方終了していれば次へ
-    var process_end = () => {
-      if (attacked && damaged) {
-        callback();
-      };
+    this.exec(cue);
+  },
+
+  critical: function(attack, callback) {
+    // 構える
+    var cue = {
+      5: () => { this.frame(8); }
     };
 
-    //攻撃終了か
-    var attacked = false;
-    this.sprite.tl.cue(cue).delay(10)
-    .then(() => {
-      this.frame(0);
-      attacked = true;
-      process_end();
+    // 鳥さんをだす
+    cue[0] = () => {
+      [...Array(300)].forEach(e => {this.bard(100, 0.75);});
+    }
+
+    // 後ろを向く
+    var frame = 8;
+    cue[frame] = () => { this.frame(9); };
+    frame += 3;
+    cue[frame] = () => { this.frame(10); };
+    frame += 3;
+    cue[frame] = () => { this.frame(11); };
+    frame += 8;
+
+    cue[frame] = scenes.battle.flash();
+    frame += 25;
+
+    cue[frame] = () => { this.frame(12); };
+    frame += 3;
+    cue[frame] = () => { this.frame(13); };
+    frame += 3;
+    cue[frame] = () => { this.frame(14); };
+
+    // 鳥さんを敵に飛ばす
+    // 目標地点
+    cue[frame + 1] = () => { this.moveBard(60, true); }; 
+
+    frame += 25;
+
+    // ダメージ処理
+    cue[frame + 25] = () => {
+      this.enemy.battle.damage(attack);
+    };
+
+    // 再びバサバサ
+    var basa = 2;
+    [...Array(20)].forEach(a => {
+      cue[frame] = () => { this.frame(15); };
+      frame += basa;
+      cue[frame] = () => { this.frame(16); };
+      frame += basa;
+    });
+
+    this.exec(cue);
+  },
+
+  bard: function(x = 25, scale = 0.5) {
+    var bard = new Sprite(30, 30);
+    bard.image = game.assets[this.data.images.bard];
+    bard.frame = random(3);
+    bard.x = this.sprite.x + x + random(40);
+    bard.y = this.sprite.y + random(-60, 40);
+    bard.scaleX = scale;
+    bard.scaleY = scale;
+    this.addChild(bard);
+    this.bards.push(bard);
+
+    bard.tl.delay(3).then(() => {
+      bard.frame = random(3);
+    }).loop();
+    bard.tl
+      .moveBy(0, 3, 10, enchant.Easing.QUAD_EASEINOUT)
+      .moveBy(0, -3, 10, enchant.Easing.QUAD_EASEINOUT)
+      .loop();
+  },
+
+  moveBard: function(time = 15, rand = false) {
+    var target = this.getEnemyPos();
+    target.x = rand ? -300 : -30;
+
+    this.bards.forEach(bard => {
+      // ふわっと移動させて画面から消す
+      let y = rand ? target.y - 30 + random(60) : target.y;
+      let t = rand ? time - 30 + random(100) : time;
+      bard.tl
+        .moveTo(target.x, y, t, enchant.Easing.QUAD_EASEINOUT)
+        .removeFromScene();
     });
   },
 });

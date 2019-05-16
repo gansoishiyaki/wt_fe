@@ -17,6 +17,10 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     this.white.opacity = 0.15;
     this.addChild(this.white);
 
+    this.flashback = new Square(WINDOW.width, WINDOW.height, "white");
+    this.flashback.opacity = 0;
+    this.addChild(this.flashback);
+
     // header
     this.header = new Square(WINDOW.width, CHIP_SIZE * 2);
     this.addChild(this.header);
@@ -39,17 +43,20 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     // 敵側からの攻撃の時は左右逆転させる
     var is_flip = enemy.is_player() && !player.is_player();
 
+    this.enemy_animation = this.setAnimation(enemy, player);
+    this.main.addChild(this.enemy_animation);
+
+    this.player_animation = this.setAnimation(player, enemy);
+    this.main.addChild(this.player_animation);
+
     this.player_window = new BattleStatusWindow(player, enemy);
     this.main.addChild(this.player_window);
 
     this.enemy_window = new BattleStatusWindow(enemy, player);
     this.main.addChild(this.enemy_window);
 
-    this.enemy_animation = this.setAnimation(enemy, player);
-    this.main.addChild(this.enemy_animation);
-
-    this.player_animation = this.setAnimation(player, enemy);
-    this.main.addChild(this.player_animation);
+    this.enemy_animation.window = this.enemy_window;
+    this.player_animation.window = this.player_window;
 
     if (is_flip) {
       this.enemy_window.x = WINDOW.width / 2;
@@ -121,6 +128,10 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
       default:
         return new Hyrein(player, enemy);
     }
+  },
+
+  flash: function() {
+    return () => {this.flashback.tl.fadeIn(5).fadeOut(5);}
   },
 });
 
