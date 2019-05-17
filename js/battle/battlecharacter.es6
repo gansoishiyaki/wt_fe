@@ -252,7 +252,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   
         // 文字を移動させる
         print.tl
-          .delay(frame + i * 5 + 5)
+          .delay(i * 5 + 10)
           .moveBy(print.width * -1, 0, 5)
           .delay(30)
           .moveBy(print.width, 0, 5)
@@ -331,7 +331,8 @@ var Hyrein = enchant.Class.create(BattleChara, {
       // 相手の構えを元に戻す
       attack.enemy.battle.frame(0);
     }
-
+    
+    // クリティカルの場合はクリティカルモーションに移行
     if (attack && attack.is_critical) {
       this.critical(attack, callback);
       return;
@@ -383,11 +384,6 @@ var Hyrein = enchant.Class.create(BattleChara, {
     // 構える
     this.cue[5] = () => { this.frame(8);}; 
 
-    // 鳥さんをだす
-    this.cue[0] = () => {
-      [...Array(300)].forEach(e => {this.bard(100, 0.75);});
-    }
-
     // 後ろを向く
     var frame = 8;
     this.cue[frame] = () => { this.frame(9); };
@@ -397,8 +393,19 @@ var Hyrein = enchant.Class.create(BattleChara, {
     this.cue[frame] = () => { this.frame(11); };
     frame += 8;
 
+    // クリティカルフラッシュ
     this.cue[frame] = scenes.battle.flash();
-    frame += 25;
+    frame += 10;
+
+    // このタイミングで発動するスキル表示はあるか
+    frame = this.setCharaStartSkill(attack, frame);
+    frame += 5;
+
+    // 鳥さんをだす
+    this.cue[frame] = () => {
+      [...Array(300)].forEach(e => {this.bard(100, 0.75);});
+    }
+    frame += 5;
 
     this.cue[frame] = () => { this.frame(12); };
     frame += 3;
