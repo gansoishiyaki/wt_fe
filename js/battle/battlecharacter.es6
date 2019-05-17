@@ -27,6 +27,13 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.addChild(this.sprite);
   },
 
+  // 元に戻す
+  setInit: function() {
+    if (!this.chara.isDead) {
+      this.frame(0);
+    }
+  },
+
   /**
    * ## frame
    * フレーム数をセットする
@@ -72,6 +79,11 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     // 攻撃が当たっていない場合は回避へ
     if (!attack.is_hit) {
       this.avoid(attack);
+      return;
+    }
+
+    if (attack.is_regist) {
+      this.regist(attack);
       return;
     }
 
@@ -171,6 +183,9 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     //攻撃終了か
     this.sprite.tl.cue(cue).delay(10)
     .then(() => {
+      if (this.enemy) {
+       this.enemy.battle.setInit(); 
+      }
       this.frame(0);
       this.attacked = true;
       this.process_end();
@@ -226,6 +241,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
   attack: function(attack, callback) {
     // 最前面に配置
     this.frontMost();
+    this.frame(0);
     this.damaged = true;
     this.attacked = false;
     this.callback = callback;

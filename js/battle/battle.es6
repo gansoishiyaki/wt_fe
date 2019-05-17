@@ -135,7 +135,7 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
   },
 });
 
-var BattlePhase = function(type, player = null, enemy = null) {
+var BattlePhase = function(type, player = null, enemy = null, beforeAttack = null) {
   this.type = type;
   this.player = player;
   this.enemy = enemy;
@@ -146,6 +146,13 @@ var BattlePhase = function(type, player = null, enemy = null) {
 
   if (type == BattleTaskType.finish) { return; }
   this.attack = new BattleAttack(player, enemy);
+
+  // 連続攻撃処理
+  if (this.attack.is_rengeki) {
+    // すでに発動済みの場合は処理しない
+    if (beforeAttack && beforeAttack.is_rengeki) { return;}
+    scenes.battle.cue.push(new BattlePhase(type, player, enemy, this.attack));
+  }
 };
 
 /////////////////////////
@@ -157,18 +164,36 @@ var BattleAttack = function(chara, enemy) {
   this.chara = chara;
   this.enemy = enemy;
 
+  this.is_regist = false;
+  this.is_rengeki = false;
+
   // 発動したスキル
-  this.chara_exec = [];
+  this.chara_start_exec = [];
+  this.chara_end_exec = [];
   this.enemy_exec = [];
+  this.enemy_before_damage = [];
 
   // 命中判定
   let hit = chara.getHit(enemy);
   this.is_hit = random(100) <= hit;
   this.damage = chara.getPower(enemy);
+  this.chara_damage = 0;
+
+  // スキル判定
+  chara.data.skills.filter(s => {
+    return s.type == SkillExecType.battle;
+  }).forEach(s => { s.rate(this);});
+
+  // クリティカル判定
   let cri = chara.getCri(enemy);
   this.is_critical = random(100) <= cri;
   if (this.is_critical) {
-    this.damage += chara.getPower();
+    this.damage = this.damage + chara.getPower();
+  }
+
+  // 吸収行為があった場合はダメージ分回復させる
+  if (this.is_drain) {
+    this.chara_damage = this.damage * -1;
   }
   
   this.finish = () => {};
@@ -307,13 +332,13 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
       };
     });
 
-    var delay = attack.enemy.isDead ? 30 : 10;
+    var delay = attack.enemy.isDead() ? 60 : 10;
 
-    this.tl.cue(cue)
-      .then(() => {
-        //その攻撃で死んだ場合
-        if (attack.enemy.isDead()) { attack.enemy.battle.dead(); }
-      }).delay(delay).then(() => {
+    if (attack.enemy.isDead()) {
+      cue[40] = () => {attack.enemy.battle.dead();}
+    }
+
+    this.tl.cue(cue).delay(delay).then(() => {
         // 攻撃終了のcallback
         attack.finish();
       });

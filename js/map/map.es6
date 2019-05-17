@@ -180,7 +180,6 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     }
 
     var moves = this.calApploach(enemy.pos, target_pos, enemy);
-    console.log(moves);
 
     // 移動終了
     let moved = () => {

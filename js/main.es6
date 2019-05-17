@@ -38,6 +38,7 @@ window.onload = () => {
       'img/system/button.png',
       'img/system/numbers.png',
       'img/system/numbersyellow.png',
+      'img/system/numbersgreen.png',
       'img/system/mini_status.png',
       'img/system/enemy_mini_status.png',
       'img/system/player_turn.png',

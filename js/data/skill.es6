@@ -19,51 +19,82 @@ var Skill = function(skill) {
 
 let SkillData = {
   alektor: {
+    id: "alektor",
     name: "キューブ化",
     description: "相手の防御力を半減して攻撃する",
     type: SkillExecType.battle,
     target: SkillTarget.enemy,
-    exec: attack => {
+    rate: attack => {
+      // スキル実行
+      attack.chara_start_exec.push(this);
+
+      // 相手の防御半分ダメージ加算
+      attack.damage += attack.enemy.getDef(this.chara) / 2;
     },
   },
 
   alektor_drain: {
+    id: "cube",
     name: "キューブ吸収",
     description: "技%で発動。与えたダメージ分吸収する。",
     type: SkillExecType.battle,
     target: SkillTarget.enemy,
-    exec: attack => {
+    rate: attack => {
       // 技%で発動
-      attack.chara.getTeh(attack.enemy);
+      let teh = attack.chara.getTeh(attack.enemy);
+      if (random(100) <= teh) {
+        attack.is_drain = true;
+        attack.chara_start_exec.push(this);
+      }
     },
   },
 
   alektor_guard: {
+    id: "fish",
     name: "生物弾ガード",
     description: "技*1.5%で発動。攻撃を無効化する。",
     type: SkillExecType.damage,
     target: SkillTarget.mine,
-    exec: attack => {
+    rate: attack => {
       // 技*1.5%で発動。
+      let teh = attack.chara.getTeh(attack.enemy) * 1.5;
+
+      // 攻撃を無効化する
+      if (random(100) <= teh) {
+        attack.is_regist = true;
+        attack.enemy_exec.push(this);
+      }
+    },
+    exec: attack => {
+      // 生物弾を表示
+      return () => {
+        
+      };
     },
   },
 
-  rensoku: {
+  rengeki: {
+    id: "rengeki",
     name: "連撃",
     description: "技%で発動。連続して攻撃する",
     type: SkillExecType.attack,
-    target: SkillTarget.mine,
-    exec: attack => {
-
+    target: SkillTarget.enemy,
+    rate: attack => {
+      // 技%で発動
+      let teh = attack.chara.getTeh(attack.enemy);
+      if (random(100) <= teh) {
+        attack.is_rengeki;
+      }
     },
   },
 
-  karisuma: {
-    name: "隊長",
-    description: "周囲の味方の回避、命中を10%上昇させる",
+  load: {
+    id: "load",
+    name: "四大領主",
+    description: "味方全員の回避、命中を10%上昇させる",
     type: SkillExecType.field,
     target: SkillTarget.cmap,
-    exec: map => {
+    rate: (chara) => {
 
     },
   },

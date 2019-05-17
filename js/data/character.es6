@@ -26,11 +26,12 @@ let Chara = {
       SkillData.alektor, 
       SkillData.alektor_drain, 
       SkillData.alektor_guard, 
-      SkillData.rensoku, 
-      SkillData.karisuma
+      SkillData.rengeki, 
+      SkillData.load
     ],
     images: {
-      bard: "img/battle/bard.png"
+      bard: "img/battle/bard.png",
+      fish: "img/battle/fish.png"
     }
   },
   hyuse: {
