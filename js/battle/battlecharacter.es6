@@ -5,8 +5,6 @@
 var BattleChara = enchant.Class.create(enchant.Group, {
   height: CHIP_SIZE * 3 - 10,
   is_flip: false,
-  attacked: false,
-  damaged: false,
   avoid_frame: 0,
   damaged_frame: 0,
   dead_frame: 0,
@@ -18,6 +16,10 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.enemy = enemy;
     this.chara.battle = this;
     this.y = CHIP_SIZE * 3;
+    this.flags = {
+      attacked: false,
+      damaged: false,
+    };
   },
 
   main: function(size) {
@@ -189,7 +191,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       if (this.enemy) { this.enemy.battle.setInit(); }
     }).delay(10).then(() => {
       this.frame(0);
-      this.attacked = true;
+      this.flags.attacked = true;
       this.processEnd();
     }); 
   },
@@ -199,7 +201,8 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * バトルのプロセスが全て終了した時にcallbackを呼ぶ
    */
   processEnd: function() {
-    if (this.attacked && this.damaged) {
+    // 全てのフラグが終了済みの場合
+    if (Object.keys(this.flags).filter(f => !this.flags[f]).length == 0 ){
       this.callback();
     };
   },
@@ -213,9 +216,9 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     if (!attack) { return; }
     // ダメージ処理が終了していれば呼ばれる
 
-    this.damaged = false;
+    this.flags.damaged = false;
     attack.finish = () => {
-      this.damaged = true;
+      this.flags.damaged = true;
       this.processEnd();
     };
   },
@@ -275,10 +278,8 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
     // スキルの起動
     attack.chara_start_exec.forEach((s, i) => {
-
-      if (s.exec) {
-        frame += s.exec(this, frame);
-      };
+      // 実行関数があれば実行
+      if (s.exec) { frame += s.exec(this, frame);};
     });
 
     return frame + 40;
@@ -317,8 +318,8 @@ var Hyrein = enchant.Class.create(BattleChara, {
     // 最前面に配置
     this.frontMost();
     this.frame(0);
-    this.damaged = true;
-    this.attacked = false;
+    this.flags.damaged = true;
+    this.flags.attacked = false;
     this.callback = callback;
     this.setDamageEnd(attack);
 
@@ -352,19 +353,20 @@ var Hyrein = enchant.Class.create(BattleChara, {
       this.cue[frame] = () => { this.frame(3); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
       frame += basa;
     });
-
     frame += 5;
-    this.cue[frame] = () => { this.frame(4); };
 
-    frame +=5;
+    this.cue[frame] = () => { this.frame(4); };
+    frame += 5;
+
     this.cue[frame] = () => { this.frame(5); };
+    frame += 1;
 
     // 鳥さんを敵に飛ばす
     // 目標地点
-    this.cue[frame + 1] = () => { this.moveBard(); }; 
+    this.cue[frame] = () => { this.moveBard(); };
 
     // ダメージ処理
-    this.cue[frame + 28] = () => {
+    this.cue[frame + 27] = ()=> {
       this.enemy.battle.damage(attack);
     };
 
