@@ -126,9 +126,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   // 本体の画像取得
   mainSprite: function() {
     var group = new Group();
-    //var sprite = new Sprite(40,40);
     var sprite = new FSprite({width: CHIP_SIZE, height: CHIP_SIZE});
-    //sprite.image = game.assets[`img/chara/map/${this.data.id}.png`];
     sprite.setImage(`img/chara/map/${this.data.id}.png`);
     group.main = sprite;
     group.addChild(sprite);

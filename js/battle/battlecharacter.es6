@@ -224,7 +224,23 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   setCharaStartSkill: function(attack, frame) {
     if (!attack || attack.chara_start_exec.length == 0) {return frame;}
 
-    // スキル発動フェクト
+    // スキル発動エフェクト
+    this.cue[frame + 1] = () => {
+      let right = new FSprite({width: 192, height: 192});
+      right.setImage('img/battle/skill.png');
+      let pos = attack.chara.battle.sprite.getCenterPos();
+      right.scaleX = 0.5;
+      right.scaleY = 0.5;
+      right.x = pos.x - 96;
+      right.y = pos.y - 96;
+      this.addChild(right);
+
+      let tl = right.tl;
+      [...Array(9)].forEach(i => {
+        tl = tl.delay(2).then(() => {right.frame++;});
+      });
+      tl.delay(2).removeFromScene();
+    };
 
     // スキルの起動
     attack.chara_start_exec.forEach((s, i) => {
@@ -234,7 +250,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       this.addChild(print);
 
       // 文字を移動させる
-      this.cue[frame + i + 1] = () => {
+      this.cue[frame + i + 5] = () => {
         print.tl
           .delay(i * 5 + 5)
           .moveBy(print.width * -1, 0, 5)
