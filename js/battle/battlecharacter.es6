@@ -158,8 +158,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    */
   regist: function(attack) {
     this.frame(0);
-    attack.finish();
-    this._regist();
+    this._regist(attack);
   },
   _regist: function(attack) {
     // ガードの表記
@@ -171,8 +170,12 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     // 左右反転
     if (this.is_flip) { str.flip();}
 
-    str.tl.moveBy(0, -10, 3).moveBy(0, 5, 3).delay(10).removeFromScene();
-
+    str.tl
+      .moveBy(0, -10, 3)
+      .moveBy(0, 5, 3)
+      .delay(10)
+      .then(() => { attack.finish();})
+      .removeFromScene();
   },
 
   dead: function() {
@@ -218,17 +221,16 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   },
 
   /**
-   * 
+   * ## showSkillExecEffect 
+   * スキル発動エフェクト表示 
+   * @param battleChara 
    * @param frame 
    */
-  setCharaStartSkill: function(attack, frame) {
-    if (!attack || attack.chara_start_exec.length == 0) {return frame;}
-
-    // スキル発動エフェクト
-    this.cue[frame + 1] = () => {
+  showSkillExecEffect: function(battleChara, frame) {
+    this.cue[frame] = () => {
       let right = new FSprite({width: 192, height: 192});
       right.setImage('img/battle/skill.png');
-      let pos = attack.chara.battle.sprite.getCenterPos();
+      let pos = battleChara.sprite.getCenterPos();
       right.scaleX = 0.5;
       right.scaleY = 0.5;
       right.x = pos.x - 96;
@@ -241,6 +243,19 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       });
       tl.delay(2).removeFromScene();
     };
+  },
+
+  /**
+   * ## setCharaStartSkill
+   * 攻撃開始前に発動するスキル 
+   * @param attack
+   * @param frame 
+   */
+  setCharaStartSkill: function(attack, frame) {
+    if (!attack || attack.chara_start_exec.length == 0) {return frame;}
+
+    // スキル発動エフェクト
+    this.showSkillExecEffect(attack.chara.battle, frame + 1);
 
     // スキルの起動
     attack.chara_start_exec.forEach((s, i) => {
