@@ -201,7 +201,7 @@ var BattleAttack = function(chara, enemy) {
   }
 
   // 吸収行為があった場合はダメージ分回復させる
-  if (this.is_drain) {
+  if (this.is_drain && this.is_hit && !this.is_regist) {
     this.self_damage = this.damage * -1;
   }
   

@@ -103,13 +103,11 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.frame(this.damaged_frame);
 
     // ダメージ処理
-    this.flags.damaged = false;
     this._damage(attack.enemy, attack, attack.damage, attack.finish);
 
     // 味方への処理
     if(attack.self_damage != 0) {
       // ダメージ処理
-    this.flags.self_damaged = false;
       this._damage(attack.chara, attack, attack.self_damage, attack.selfFinish);
     }
   },
@@ -215,6 +213,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     //攻撃終了か
     this.sprite.tl.cue(this.cue).then(() => {
       // 相手のダメージモーションを元に戻す
+      console.log('setInit', this.enemy);
       if (this.enemy) { this.enemy.battle.setInit(); }
     }).delay(10).then(() => {
       this.frame(0);
@@ -260,6 +259,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
     // ダメージ処理が終了していれば呼ばれる
     // 敵
+    this.flags.damaged = false;
     attack.finish = () => {
       this.flags.damaged = true;
       this.processEnd();
@@ -267,6 +267,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
     // 味方
     if (attack.self_damage != 0) {
+      this.flags.self_damaged = false;
       attack.selfFinish = () => {
         this.flags.self_damaged = true;
         this.processEnd();
@@ -297,7 +298,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       right.scaleY = 0.5;
       right.x = pos.x - 96;
       right.y = pos.y - 96;
-      this.addChild(right);
+      battleChara.addChild(right);
 
       let tl = right.tl;
       [...Array(9)].forEach(i => {
@@ -308,9 +309,10 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       // スキルの起動
       skills.forEach((s, i) => {
         // 発動文字表示
-        let print = new PrintSkill(this.chara, s);
+        let print = new PrintSkill(battleChara.chara, s);
         print.y = 0 + i * print.height;
-        this.addChild(print);
+        battleChara.addChild(print);
+        console.log(s.name, battleChara.chara, !scenes.battle.isRight(battleChara.chara));
   
         // 文字を移動させる
         print.tl
@@ -340,7 +342,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     // スキルの起動
     attack.chara_start_exec.forEach((s, i) => {
       // 実行関数があれば実行
-      if (s.exec) { frame += s.exec(this, frame);};
+      if (s.exec) { frame = s.exec(this, frame);};
     });
 
     return frame + 10;
@@ -356,7 +358,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   setEnemySkill: function(attack, frame) {
     if (!attack || attack.enemy_exec.length == 0) {return frame;}
 
-    console.log(attack.enemy_exec);
+    console.log('before', frame);
 
     // スキル発動エフェクト
     frame = this.showSkillExecEffect(attack.enemy_exec, attack.enemy.battle, frame);
@@ -364,8 +366,10 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     // スキルの起動
     attack.enemy_exec.forEach((s, i) => {
       // 実行関数があれば実行
-      if (s.exec) { frame += s.exec(this, frame);};
+      if (s.exec) { frame = s.exec(attack, frame);};
     });
+
+    console.log('after', frame);
 
     return frame + 10; 
   },

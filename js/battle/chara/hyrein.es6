@@ -153,28 +153,49 @@ var Hyrein = enchant.Class.create(BattleChara, {
     });
   },
 
-  fish: function(frame) {
-    this.cue[frame] = () => { this._fish(); };
+  fish: function(attack, frame) {
+    this.cue[frame] = () => { attack.enemy.battle._fish(); };
 
-    return frame + 40;
+    return frame;
   },
 
-  _fish: function() {
+  _fish: function(chara) {
+
+    this.frame(4);
+
+    let pos = this.sprite.getCenterPos();
+
     // 魚をブワッとだす
-
-    let pos = this.etCenterPos();
-
-    this.fishs = [...Array(50)].map(i => {
-      var fish = new Sprite(30, 30);
-      fish.image = game.assets[this.data.images.fish];
-      fish.x = pos.x - this.size / 2;
-      fish.y = pos.y - this.size / 2 + random(60);
-      this.addChild(fish);
-
-      fish.tl
-        .moveBy(this.size.width, 0, 10, enchant.Easing.QUAD_EASEINOUT)
-        .moveBy(this.size.width * -1, 0, 0)
-        .loop();
+    this.tl.delay(10).then(() => {
+      this.fishs = [...Array(100)].map(i => {
+        var fish = new FSprite({width: 30, height: 30});
+        fish.setImage(this.data.images.fish);
+        let x = pos.x - this.size.width / 2 - 5;
+        fish.x = x;
+        let rand = -10 + random(20); 
+        fish.y = pos.y + rand - 15;
+        fish.scaleX = 0.15;
+        fish.scaleY = 0.15;
+        let y = fish.y;
+        let movex = this.size.width / 2 + 20;
+        let movey = rand * 2;
+        let speed = random(5, 40);
+  
+        fish.tl
+          .fadeIn(1)
+          .moveBy(movex / 2, movey, speed, enchant.Easing.SIN_EASEIN)
+          .and()
+          .scaleTo(0.4, 0.4, speed, enchant.Easing.SIN_EASEIN)
+          .moveBy(movex / 2, -movey, speed, enchant.Easing.SIN_EASEOUT)
+          .and()
+          .scaleTo(0.15, 0.15, speed, enchant.Easing.SIN_EASEOUT)
+          .fadeOut(1)
+          .moveTo(x, y, 1)
+          .loop();
+  
+        this.addChild(fish);
+        return fish;
+      });
     });
   },
 

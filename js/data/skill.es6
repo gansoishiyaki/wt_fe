@@ -2,8 +2,7 @@ let SkillExecType = {
   allways: 0, // 常時発動
   field: 1, // フィールドの条件で発動
   battle: 2, // 戦闘中 
-  damage: 3, // 戦闘、受け手側
-  other: 4 // その他
+  other: 3 // その他
 }
 
 let SkillTarget = {
@@ -55,11 +54,11 @@ let SkillData = {
     id: "fish",
     name: "生物弾ガード",
     description: "技*1.5%で発動。攻撃を無効化する。",
-    type: SkillExecType.damage,
+    type: SkillExecType.battle,
     target: SkillTarget.mine,
     rate: function(attack) {
       // 技*1.5%で発動。
-      let teh = attack.chara.getTeh(attack.enemy) * 1.5;
+      let teh = attack.enemy.getTeh(attack.chara) * 1.5;
 
       // 攻撃を無効化する
       if (random(100) <= teh) {
@@ -67,9 +66,9 @@ let SkillData = {
         this.setExec(attack.enemy_exec);
       }
     },
-    exec: (battleChara, frame) => {
+    exec: (attack, frame) => {
       // 生物弾を表示
-      return battleChara.fish(frame);
+      return attack.chara.battle.fish(attack, frame);
     },
   },
 
@@ -77,7 +76,7 @@ let SkillData = {
     id: "rengeki",
     name: "連撃",
     description: "技%で発動。連続して攻撃する",
-    type: SkillExecType.attack,
+    type: SkillExecType.battle,
     target: SkillTarget.enemy,
     rate: function(attack) {
       // 技%で発動
