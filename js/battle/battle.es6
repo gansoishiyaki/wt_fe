@@ -41,7 +41,7 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     this.enemy = enemy;
 
     // 敵側からの攻撃の時は左右逆転させる
-    var is_flip = enemy.is_player() && !player.is_player();
+    this.is_flip = enemy.is_player() && !player.is_player();
 
     this.enemy_animation = this.setAnimation(enemy, player);
     this.main.addChild(this.enemy_animation);
@@ -58,7 +58,7 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     this.enemy_animation.window = this.enemy_window;
     this.player_animation.window = this.player_window;
 
-    if (is_flip) {
+    if (this.is_flip) {
       this.enemy_window.x = WINDOW.width / 2;
       this.player_animation.setFlip();
     } else {
@@ -140,7 +140,7 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
    * @return {Bool} 右側か
    */
   isRight: function(chara) {
-    return this.chara === chara;
+    return this.is_flip ? this.enemy === chara : this.player === chara;
   },
 });
 
@@ -189,9 +189,9 @@ var BattleAttack = function(chara, enemy) {
   this.chara_damage = 0;
 
   // スキル判定
-  chara.data.skills.filter(s => {
+  chara.skills.filter(s => {
     return s.type == SkillExecType.battle;
-  }).forEach(s => { s.rate(this);});
+  }).filter(s => { s.rate(this);});
 
   // クリティカル判定
   let cri = chara.getCri(enemy);
@@ -370,18 +370,22 @@ var PrintSkill = enchant.Class.create(enchant.Group, {
    */
   initialize: function(chara, skill) {
     enchant.Group.call(this);
-
-    this.back = new Square(1, 20);
-    this.back.opacity = 0.5;
-    this.addChild(this.back);
+    this.height = 15;
     
-    this.label = FLabel(skill.name, 20, 2, 2);
-    this.addChild(this.label);
-    this.back.scaleX = this.label.main._boundWidth;
+    this.label = new FLabel(skill.name, 10, 2, 4);
 
-    if (scenes.battle.isRight(chara)) {
+    this.width = this.label.main._boundWidth + 4;
+    this.back = new Square(this.width, this.height);
+    this.back.opacity = 0.5;
+
+    this.addChild(this.back);
+    this.addChild(this.label);
+
+    this.x = WINDOW.width;
+
+    if (!scenes.battle.isRight(chara)) {
       this.setFlip();
-    }
+    };
   },
 
   // 左右逆転

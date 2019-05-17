@@ -181,23 +181,31 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
   exec: function() {
     //攻撃終了か
-    this.sprite.tl.cue(this.cue).delay(10)
-    .then(() => {
-      if (this.enemy) {
-       this.enemy.battle.setInit(); 
-      }
+    this.sprite.tl.cue(this.cue).then(() => {
+      // 相手のダメージモーションを元に戻す
+      if (this.enemy) { this.enemy.battle.setInit(); }
+    }).delay(10).then(() => {
       this.frame(0);
       this.attacked = true;
-      this.process_end();
+      this.processEnd();
     }); 
   },
 
-  process_end: function() {
+  /**
+   * ## processEnd
+   * バトルのプロセスが全て終了した時にcallbackを呼ぶ
+   */
+  processEnd: function() {
     if (this.attacked && this.damaged) {
       this.callback();
     };
   },
 
+  /**
+   * ## setDamageEnd
+   * ダメージ処理終了時によぶ
+   * @param attack 
+   */
   setDamageEnd: function(attack) {
     if (!attack) { return; }
     // ダメージ処理が終了していれば呼ばれる
@@ -205,8 +213,42 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.damaged = false;
     attack.finish = () => {
       this.damaged = true;
-      this.process_end();
+      this.processEnd();
     };
+  },
+
+  /**
+   * 
+   * @param frame 
+   */
+  setCharaStartSkill: function(attack, frame) {
+    if (!attack || attack.chara_start_exec.length == 0) {return frame;}
+
+    // スキル発動フェクト
+
+    // スキルの起動
+    attack.chara_start_exec.forEach((s, i) => {
+      // 発動文字表示
+      let print = new PrintSkill(this.chara, s);
+      print.y = 0 + i * print.height;
+      this.addChild(print);
+
+      // 文字を移動させる
+      this.cue[frame + i + 1] = () => {
+        print.tl
+          .delay(i * 5 + 5)
+          .moveBy(print.width * -1, 0, 5)
+          .delay(30)
+          .moveBy(print.width, 0, 5)
+          .removeFromScene();
+      };
+
+      if (s.exec) {
+        frame += s.exec(this, frame);
+      };
+    });
+
+    return frame + 40;
   },
 });
 
@@ -266,14 +308,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
     this.cue[frame] = () => { this.frame(1); };
 
     // このタイミングで発動するスキル表示はあるか
-    if (attack && attack.chara_start_exec.length > 0) {
-      attack.chara_start_exec.forEach(s => {
-        let print = new PrintSkill(this.chara, s);
-        if (s.exec) {
-          let add_cue = s.exec(this);
-        };
-      });
-    }
+    frame = this.setCharaStartSkill(attack, frame);
 
     //マントバサバサ && 鳥さん飛ばす
     let basa = 3;
@@ -393,5 +428,15 @@ var Hyrein = enchant.Class.create(BattleChara, {
         .moveTo(target.x, y, t, enchant.Easing.QUAD_EASEINOUT)
         .removeFromScene();
     });
+  },
+
+  fish: function(frame) {
+    this.cue[frame] = () => { this._fish(); };
+
+    return frame + 40;
+  },
+
+  _fish: function() {
+    // 魚をブワッとだす
   },
 });

@@ -22,6 +22,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.pos = new Pos();
     this.range = {};
     this.move_flag = false;
+    this.skills = data.skills.map(s => new Skill(s));
     this.camp = camp;
     
     // mainスプライト

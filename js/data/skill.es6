@@ -15,6 +15,10 @@ let SkillTarget = {
 
 var Skill = function(skill) {
   Object.assign(this, skill);
+  
+  this.setExec = function(array) {
+    array = array.push(this);
+  }
 }
 
 let SkillData = {
@@ -24,12 +28,10 @@ let SkillData = {
     description: "相手の防御力を半減して攻撃する",
     type: SkillExecType.battle,
     target: SkillTarget.enemy,
-    rate: attack => {
-      // スキル実行
-      attack.chara_start_exec.push(this);
-
+    rate: function(attack) {
       // 相手の防御半分ダメージ加算
       attack.damage += attack.enemy.getDef(this.chara) / 2;
+      this.setExec(attack.chara_start_exec);
     },
   },
 
@@ -39,12 +41,12 @@ let SkillData = {
     description: "技%で発動。与えたダメージ分吸収する。",
     type: SkillExecType.battle,
     target: SkillTarget.enemy,
-    rate: attack => {
+    rate: function(attack) {
       // 技%で発動
       let teh = attack.chara.getTeh(attack.enemy);
       if (random(100) <= teh) {
         attack.is_drain = true;
-        attack.chara_start_exec.push(this);
+        this.setExec(attack.chara_start_exec);
       }
     },
   },
@@ -55,19 +57,19 @@ let SkillData = {
     description: "技*1.5%で発動。攻撃を無効化する。",
     type: SkillExecType.damage,
     target: SkillTarget.mine,
-    rate: attack => {
+    rate: function(attack) {
       // 技*1.5%で発動。
       let teh = attack.chara.getTeh(attack.enemy) * 1.5;
 
       // 攻撃を無効化する
       if (random(100) <= teh) {
         attack.is_regist = true;
-        attack.enemy_exec.push(this);
+        this.setExec(attack.enemy_exec);
       }
     },
-    exec: battleChara => {
+    exec: (battleChara, frame) => {
       // 生物弾を表示
-      return battleChara.fish();
+      return battleChara.fish(frame);
     },
   },
 
@@ -77,7 +79,7 @@ let SkillData = {
     description: "技%で発動。連続して攻撃する",
     type: SkillExecType.attack,
     target: SkillTarget.enemy,
-    rate: attack => {
+    rate: function(attack) {
       // 技%で発動
       let teh = attack.chara.getTeh(attack.enemy);
       if (random(100) <= teh) {
@@ -92,8 +94,7 @@ let SkillData = {
     description: "味方全員の回避、命中を10%上昇させる",
     type: SkillExecType.field,
     target: SkillTarget.cmap,
-    rate: (chara) => {
-
+    rate: (chara, taeget) => {
     },
   },
 }
