@@ -226,7 +226,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * @param battleChara 
    * @param frame 
    */
-  showSkillExecEffect: function(battleChara, frame) {
+  showSkillExecEffect: function(skills, battleChara, frame) {
     this.cue[frame] = () => {
       let right = new FSprite({width: 192, height: 192});
       right.setImage('img/battle/skill.png');
@@ -242,6 +242,22 @@ var BattleChara = enchant.Class.create(enchant.Group, {
         tl = tl.delay(2).then(() => {right.frame++;});
       });
       tl.delay(2).removeFromScene();
+
+      // スキルの起動
+      skills.forEach((s, i) => {
+        // 発動文字表示
+        let print = new PrintSkill(this.chara, s);
+        print.y = 0 + i * print.height;
+        this.addChild(print);
+  
+        // 文字を移動させる
+        print.tl
+          .delay(frame + i * 5 + 5)
+          .moveBy(print.width * -1, 0, 5)
+          .delay(30)
+          .moveBy(print.width, 0, 5)
+          .removeFromScene();
+      });
     };
   },
 
@@ -255,24 +271,10 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     if (!attack || attack.chara_start_exec.length == 0) {return frame;}
 
     // スキル発動エフェクト
-    this.showSkillExecEffect(attack.chara.battle, frame + 1);
+    this.showSkillExecEffect(attack.chara_start_exec, attack.chara.battle, frame + 1);
 
     // スキルの起動
     attack.chara_start_exec.forEach((s, i) => {
-      // 発動文字表示
-      let print = new PrintSkill(this.chara, s);
-      print.y = 0 + i * print.height;
-      this.addChild(print);
-
-      // 文字を移動させる
-      this.cue[frame + i + 5] = () => {
-        print.tl
-          .delay(i * 5 + 5)
-          .moveBy(print.width * -1, 0, 5)
-          .delay(30)
-          .moveBy(print.width, 0, 5)
-          .removeFromScene();
-      };
 
       if (s.exec) {
         frame += s.exec(this, frame);
