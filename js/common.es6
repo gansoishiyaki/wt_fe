@@ -68,7 +68,7 @@ let Status = {
   luk: "運",
   hit: "命中",
   avo: "回避",
- }
+ };
 
 let FPS = 25;
 

@@ -342,7 +342,7 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
       };
     });
 
-    var delay = chara.isDead() ? 60 : 10;
+    var delay = chara.isDead() ? 50 : 10;
 
     if (chara.isDead()) {
       cue[40] = () => {chara.battle.dead();}

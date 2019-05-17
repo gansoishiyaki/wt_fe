@@ -35,7 +35,15 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     if (!this.chara.isDead) {
       this.frame(0);
     }
+
+    this.clear();
   },
+
+  /**
+   * ## clear
+   * 出してたエフェクトなどをしまう。
+   */
+  clear: function() {},
 
   /**
    * ## frame
@@ -95,11 +103,13 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.frame(this.damaged_frame);
 
     // ダメージ処理
+    this.flags.damaged = false;
     this._damage(attack.enemy, attack, attack.damage, attack.finish);
 
     // 味方への処理
     if(attack.self_damage != 0) {
       // ダメージ処理
+    this.flags.self_damaged = false;
       this._damage(attack.chara, attack, attack.self_damage, attack.selfFinish);
     }
   },
@@ -250,7 +260,6 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
     // ダメージ処理が終了していれば呼ばれる
     // 敵
-    this.flags.damaged = false;
     attack.finish = () => {
       this.flags.damaged = true;
       this.processEnd();
@@ -258,7 +267,6 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
     // 味方
     if (attack.self_damage != 0) {
-      this.flags.self_damaged = false;
       attack.selfFinish = () => {
         this.flags.self_damaged = true;
         this.processEnd();
@@ -313,6 +321,8 @@ var BattleChara = enchant.Class.create(enchant.Group, {
           .removeFromScene();
       });
     };
+
+    return frame + 30;
   },
 
   /**
@@ -325,7 +335,7 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     if (!attack || attack.chara_start_exec.length == 0) {return frame;}
 
     // スキル発動エフェクト
-    this.showSkillExecEffect(attack.chara_start_exec, attack.chara.battle, frame + 1);
+    frame = this.showSkillExecEffect(attack.chara_start_exec, attack.chara.battle, frame);
 
     // スキルの起動
     attack.chara_start_exec.forEach((s, i) => {
@@ -333,7 +343,31 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       if (s.exec) { frame += s.exec(this, frame);};
     });
 
-    return frame + 40;
+    return frame + 10;
+  },
+
+  /**
+   * ## setEnemySkill
+   * 攻撃開始前に敵が発動するスキル 
+   * @param attack 
+   * @param frame 
+   * @return {Int} frame
+   */
+  setEnemySkill: function(attack, frame) {
+    if (!attack || attack.enemy_exec.length == 0) {return frame;}
+
+    console.log(attack.enemy_exec);
+
+    // スキル発動エフェクト
+    frame = this.showSkillExecEffect(attack.enemy_exec, attack.enemy.battle, frame);
+
+    // スキルの起動
+    attack.enemy_exec.forEach((s, i) => {
+      // 実行関数があれば実行
+      if (s.exec) { frame += s.exec(this, frame);};
+    });
+
+    return frame + 10; 
   },
 });
 

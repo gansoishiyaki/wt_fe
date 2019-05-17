@@ -61,6 +61,12 @@ window.onload = () => {
         preload_chara(enemy.chara);
       });
     }
+
+    // skill
+    for (key in SkillData) {
+      let skill = SkillData[key];
+      game.preload(`img/system/skill/${skill.id}.png`);
+    }
   };
 
   // キャラクターのpreload

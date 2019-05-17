@@ -1,5 +1,6 @@
 var Hyrein = enchant.Class.create(BattleChara, {
   bards: [],
+  fishs: [],
   damaged_frame: 17,
   dead_frame: 18,
   initialize: function(chara, enemy) {
@@ -22,6 +23,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
     // このタイミングで発動するスキル表示はあるか
     frame = this.setCharaStartSkill(attack, frame);
+    frame = this.setEnemySkill(attack, frame);
 
     //マントバサバサ && 鳥さん飛ばす
     let basa = 3;
@@ -79,6 +81,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
     // このタイミングで発動するスキル表示はあるか
     frame = this.setCharaStartSkill(attack, frame);
+    frame = this.setEnemySkill(attack, frame);
     frame += 5;
 
     // 鳥さんをだす
@@ -158,5 +161,27 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
   _fish: function() {
     // 魚をブワッとだす
+
+    let pos = this.etCenterPos();
+
+    this.fishs = [...Array(50)].map(i => {
+      var fish = new Sprite(30, 30);
+      fish.image = game.assets[this.data.images.fish];
+      fish.x = pos.x - this.size / 2;
+      fish.y = pos.y - this.size / 2 + random(60);
+      this.addChild(fish);
+
+      fish.tl
+        .moveBy(this.size.width, 0, 10, enchant.Easing.QUAD_EASEINOUT)
+        .moveBy(this.size.width * -1, 0, 0)
+        .loop();
+    });
+  },
+
+  clear: function() {
+    // 魚を削除する
+    this.fishs.forEach(fish => {
+      fish.tl.removeFromScene();
+    });
   },
 });
