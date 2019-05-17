@@ -1,12 +1,3 @@
-let Status = {
- maxhp: "ＨＰ",
- atk: "攻撃",
- def: "防御",
- spd: "機動",
- teh: "技術",
- luk: "運",
-}
-
 let Chara = {
   hyrein: {
     id: "hyrein",

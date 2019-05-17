@@ -9,7 +9,7 @@ let SkillExecType = {
 let SkillTarget = {
   enemy: 0,
   mine: 1,
-  cmap: 2,
+  camp: 2,
   all: 3
 }
 
@@ -90,10 +90,11 @@ let SkillData = {
 
   load: {
     id: "load",
-    name: "四大領主",
-    description: "味方全員の回避、命中を10%上昇させる",
+    name: "侵攻部隊隊長",
+    description: "3マス以内の相手の命中・回避率を10%下げる",
     type: SkillExecType.field,
-    target: SkillTarget.cmap,
+    target: SkillTarget.camp,
+    status: [Status.hit, Status.avo],
     rate: (chara, taeget) => {
     },
   },

@@ -59,6 +59,17 @@ let TurnType = {
   enemy: 1
 }
 
+let Status = {
+  maxhp: "ＨＰ",
+  atk: "攻撃",
+  def: "防御",
+  spd: "機動",
+  teh: "技術",
+  luk: "運",
+  hit: "命中",
+  avo: "回避",
+ }
+
 let FPS = 25;
 
 var Common = {

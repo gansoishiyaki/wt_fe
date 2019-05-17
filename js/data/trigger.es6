@@ -11,7 +11,7 @@ let Trigger = {
     atk: 12,
     rank: "s",
     hit: 70,
-    cri: 40,
+    cri: 0,
     is_black: true,
     description: "与えたダメージを吸収する。<br>※ハイレイン専用",
     range: 2,

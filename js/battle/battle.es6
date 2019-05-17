@@ -186,7 +186,7 @@ var BattleAttack = function(chara, enemy) {
   let hit = chara.getHit(enemy);
   this.is_hit = random(100) <= hit;
   this.damage = chara.getPower(enemy);
-  this.chara_damage = 0;
+  this.self_damage = 0;
 
   // スキル判定
   chara.skills.filter(s => {
@@ -202,10 +202,11 @@ var BattleAttack = function(chara, enemy) {
 
   // 吸収行為があった場合はダメージ分回復させる
   if (this.is_drain) {
-    this.chara_damage = this.damage * -1;
+    this.self_damage = this.damage * -1;
   }
   
   this.finish = () => {};
+  this.selfFinish = () => {};
 };
 
 /////////////////////////
@@ -327,29 +328,29 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
     this.setHP(chara.hp);
   },
 
-  damage: function(attack) {
-    this.chara.damage(attack.damage);
+  damage: function(chara, damage, callback = null) {
+    chara.damage(damage);
 
-    let sa = Math.abs(this.hp - this.chara.hp);
+    let sa = Math.abs(this.hp - chara.hp);
     var frame = sa >= 10 ? 1 : 2;
 
     let cue = {};
     [...Array(sa).keys()].forEach(i =>{
       cue[i * frame] = () => {
-        let change = this.hp >= this.chara.hp ? -1 : 1;
+        let change = this.hp >= chara.hp ? -1 : 1;
         this.setHP(this.hp + change);
       };
     });
 
-    var delay = attack.enemy.isDead() ? 60 : 10;
+    var delay = chara.isDead() ? 60 : 10;
 
-    if (attack.enemy.isDead()) {
-      cue[40] = () => {attack.enemy.battle.dead();}
+    if (chara.isDead()) {
+      cue[40] = () => {chara.battle.dead();}
     }
 
     this.tl.cue(cue).delay(delay).then(() => {
         // 攻撃終了のcallback
-        attack.finish();
+        if(callback) { callback() };
       });
   },
 

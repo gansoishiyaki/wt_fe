@@ -69,6 +69,8 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     this.main.addChild(this.status);
 
     Object.keys(Status).forEach((key, i) => {
+      if (i > 5) {return;}
+
       // ステータスラベル
       var height = i * 25;
       var status_label = new FLabel(Status[key], 12, 0, height);
