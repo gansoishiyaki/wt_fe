@@ -133,6 +133,15 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
   flash: function() {
     return () => {this.flashback.tl.fadeIn(5).fadeOut(5);}
   },
+
+  /**
+   * 自分の位置がどちらか確かめる
+   * @param chara 
+   * @return {Bool} 右側か
+   */
+  isRight: function(chara) {
+    return this.chara === chara;
+  },
 });
 
 var BattlePhase = function(type, player = null, enemy = null, beforeAttack = null) {
@@ -349,5 +358,34 @@ var BattleHPGage = enchant.Class.create(enchant.Group, {
     this.gages.forEach((gage, i) => {
       gage.opacity = hp > i ? 1 : 0;
     });
+  },
+});
+
+var PrintSkill = enchant.Class.create(enchant.Group, {
+
+  /**
+   * @constructor
+   * @param chara 
+   * @param skill 
+   */
+  initialize: function(chara, skill) {
+    enchant.Group.call(this);
+
+    this.back = new Square(1, 20);
+    this.back.opacity = 0.5;
+    this.addChild(this.back);
+    
+    this.label = FLabel(skill.name, 20, 2, 2);
+    this.addChild(this.label);
+    this.back.scaleX = this.label.main._boundWidth;
+
+    if (scenes.battle.isRight(chara)) {
+      this.setFlip();
+    }
+  },
+
+  // 左右逆転
+  setFlip: function() {
+    this.label.flip();
   },
 });

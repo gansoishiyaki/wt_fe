@@ -179,9 +179,9 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     this.frame(this.dead_frame);
   },
 
-  exec: function(cue) {
+  exec: function() {
     //攻撃終了か
-    this.sprite.tl.cue(cue).delay(10)
+    this.sprite.tl.cue(this.cue).delay(10)
     .then(() => {
       if (this.enemy) {
        this.enemy.battle.setInit(); 
@@ -249,6 +249,9 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
     this.bards = [];
 
+    this.cue = {};
+    var frame = 5;
+
     if (attack) {
       // 相手の構えを元に戻す
       attack.enemy.battle.frame(0);
@@ -260,97 +263,102 @@ var Hyrein = enchant.Class.create(BattleChara, {
     }
 
     // 構える
-    var cue = {
-      5: () => { this.frame(1) }
-    };
+    this.cue[frame] = () => { this.frame(1); };
+
+    // このタイミングで発動するスキル表示はあるか
+    if (attack && attack.chara_start_exec.length > 0) {
+      attack.chara_start_exec.forEach(s => {
+        let print = new PrintSkill(this.chara, s);
+        if (s.exec) {
+          let add_cue = s.exec(this);
+        };
+      });
+    }
 
     //マントバサバサ && 鳥さん飛ばす
-    var frame = 12;
     let basa = 3;
     [...Array(6)].forEach(a => {
-      cue[frame] = () => { this.frame(2); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
+      this.cue[frame] = () => { this.frame(2); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
       frame += basa;
-      cue[frame] = () => { this.frame(3); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
+      this.cue[frame] = () => { this.frame(3); this.bard(); this.bard(); this.bard(); this.bard(); this.bard(); };
       frame += basa;
     });
 
     frame += 5;
-    cue[frame] = () => { this.frame(4); };
+    this.cue[frame] = () => { this.frame(4); };
 
     frame +=5;
-    cue[frame] = () => { this.frame(5); };
+    this.cue[frame] = () => { this.frame(5); };
 
     // 鳥さんを敵に飛ばす
     // 目標地点
-    cue[frame + 1] = () => { this.moveBard(); }; 
+    this.cue[frame + 1] = () => { this.moveBard(); }; 
 
     // ダメージ処理
-    cue[frame + 28] = () => {
+    this.cue[frame + 28] = () => {
       this.enemy.battle.damage(attack);
     };
 
     // 再びバサバサ
     frame += 5;
     [...Array(10)].forEach(a => {
-      cue[frame] = () => { this.frame(6); };
+      this.cue[frame] = () => { this.frame(6); };
       frame += basa;
-      cue[frame] = () => { this.frame(7); };
+      this.cue[frame] = () => { this.frame(7); };
       frame += basa;
     });
 
-    this.exec(cue);
+    this.exec();
   },
 
   critical: function(attack, callback) {
     // 構える
-    var cue = {
-      5: () => { this.frame(8); }
-    };
+    this.cue[5] = () => { this.frame(8);}; 
 
     // 鳥さんをだす
-    cue[0] = () => {
+    this.cue[0] = () => {
       [...Array(300)].forEach(e => {this.bard(100, 0.75);});
     }
 
     // 後ろを向く
     var frame = 8;
-    cue[frame] = () => { this.frame(9); };
+    this.cue[frame] = () => { this.frame(9); };
     frame += 3;
-    cue[frame] = () => { this.frame(10); };
+    this.cue[frame] = () => { this.frame(10); };
     frame += 3;
-    cue[frame] = () => { this.frame(11); };
+    this.cue[frame] = () => { this.frame(11); };
     frame += 8;
 
-    cue[frame] = scenes.battle.flash();
+    this.cue[frame] = scenes.battle.flash();
     frame += 25;
 
-    cue[frame] = () => { this.frame(12); };
+    this.cue[frame] = () => { this.frame(12); };
     frame += 3;
-    cue[frame] = () => { this.frame(13); };
+    this.cue[frame] = () => { this.frame(13); };
     frame += 3;
-    cue[frame] = () => { this.frame(14); };
+    this.cue[frame] = () => { this.frame(14); };
 
     // 鳥さんを敵に飛ばす
     // 目標地点
-    cue[frame + 1] = () => { this.moveBard(60, true); }; 
+    this.cue[frame + 1] = () => { this.moveBard(60, true); }; 
 
     frame += 25;
 
     // ダメージ処理
-    cue[frame + 25] = () => {
+    this.cue[frame + 25] = () => {
       this.enemy.battle.damage(attack);
     };
 
     // 再びバサバサ
     var basa = 2;
     [...Array(20)].forEach(a => {
-      cue[frame] = () => { this.frame(15); };
+      this.cue[frame] = () => { this.frame(15); };
       frame += basa;
-      cue[frame] = () => { this.frame(16); };
+      this.cue[frame] = () => { this.frame(16); };
       frame += basa;
     });
 
-    this.exec(cue);
+    this.exec();
   },
 
   bard: function(x = 25, scale = 0.5) {

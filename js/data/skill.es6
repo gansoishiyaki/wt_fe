@@ -65,11 +65,9 @@ let SkillData = {
         attack.enemy_exec.push(this);
       }
     },
-    exec: attack => {
+    exec: battleChara => {
       // 生物弾を表示
-      return () => {
-        
-      };
+      return battleChara.fish();
     },
   },
 
