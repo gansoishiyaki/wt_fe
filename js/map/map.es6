@@ -775,6 +775,7 @@ var MiniStatus = enchant.Class.create(enchant.Group, {
 
   set_chara: function(chara) {
     this.chara = chara;
+    this.removeAll();
 
     // ウィンドウ表示
     let filename = chara.is_enemy() ? "enemy_mini_status" : "mini_status";
@@ -807,13 +808,32 @@ var MiniStatus = enchant.Class.create(enchant.Group, {
     this.image.y = status_y;
     this.addChild(this.image);
 
-    // スキル表示
+    // トリガー表示
     this.skill_text = new FLabel(chara.data.main_trigger.name, 12, 60, status_y);
     this.skill_text.setShadow();
     this.addChild(this.skill_text);
 
+    // スキル表示
+    this.skillGroup = new Group();
+    this.skillGroup.x = 55;
+    this.skillGroup.y = status_y + 15;
+    this.addChild(this.skillGroup);
+
+    chara.skills.forEach((s, i) => {
+      let sImage = s.image();
+      sImage.x = i * 25;
+      this.skillGroup.addChild(sImage);
+
+      // タッチしたらスキル説明文
+      sImage.on(Event.TOUCH_END, e => {
+        scenes.skill.setSkill(s);
+      });
+    });
+
     // スキル説明
+    /*
     this.description = new FLabel(chara.data.main_trigger.description, 10, 60, status_y + 20);
     this.addChild(this.description);
+    */
   },
 });
