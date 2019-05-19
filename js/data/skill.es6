@@ -38,7 +38,7 @@ let SkillData = {
       let teh = attack.chara.getTeh(scenes.map, attack.enemy) * 3;
       if (random(100) <= teh) {
         // 相手の防御半分ダメージ加算
-        attack.damage += attack.enemy.getDef(this.chara) / 2;
+        attack.damage += attack.enemy.getDef(scenes.map, this.chara) / 2;
         this.setExec(attack.chara_exec);
       }
     },
@@ -105,7 +105,7 @@ let SkillData = {
     target: SkillTarget.enemy,
     target_range: 3,
     status: [Status.hit, Status.avo],
-    exec: () => {
+    exec: (chara, by) => {
       return -10;
     },
   },

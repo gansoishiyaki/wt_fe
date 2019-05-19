@@ -106,9 +106,9 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
     let param_strs = ["ＨＰ", "威力", "命中", "必殺"];
     let params = [
       chara.hp,
-      chara.getPower(enemy),
-      chara.getHit(enemy),
-      chara.getCri(enemy)
+      chara.getPower(scenes.map, enemy),
+      chara.getHit(scenes.map, enemy),
+      chara.getCri(scenes.map, enemy)
     ];
 
     param_strs.forEach((param_str, i) => {
@@ -120,7 +120,7 @@ var PreBattleStatusWindow = enchant.Class.create(enchant.Group, {
 
       var num_str = "";
 
-      if (param_str == "威力" && chara.isMoreAttack(enemy)) {
+      if (param_str == "威力" && chara.isMoreAttack(scenes.map, enemy)) {
         num_str = "yellow";
       }
 

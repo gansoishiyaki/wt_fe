@@ -726,17 +726,65 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   },
 
   /**
+   * ## getEnemyByChara
+   * そのキャラからみて敵のキャラを取得する 
+   * @param chara 
+   */
+  getEnemyByChara: function(chara) {
+    return this.otherCampCharas(chara.camp);
+  },
+
+  /**
+   * ## getFriendByChara
+   * そのキャラからみて味方のキャラを取得する 
+   * @param chara 
+   */
+  getFriendByChara: function(chara) {
+    return this.sameCampCharas(chara.camp);
+  },
+
+  /**
    * ## getFloorSkill 
    * フロア影響のスキルを取得する
    * @param chara 
    * @param status
+   * @return //[{chara, by, skill}]
    */
   getFloorSkill: function(chara, status) {
-    var skills = []; // {chara, enemy, skillの配列}
-    
+    var skills = []; // {chara, by, skillの配列}
 
+    // 敵のスキル影響 targetがEnemyのスキル
+    this.getEnemyByChara(chara).forEach(c => {
+      c.skills.filter(s => s.target == SkillTarget.enemy).map(s => {
+        skills.push({chara: chara, by: c, skill: s});
+      });
+    });
 
-    return skills.map(s => s.skill);
+    // 味方のスキル影響 targetがcampのスキル
+    this.getFriendByChara(chara).forEach(c => {
+      c.skills.filter(s => s.target == SkillTarget.camp).map(s => {
+        skills.push({chara: chara, by: c, skill: s});
+      });
+    });
+
+    // 自分対象のスキル
+    chara.skills.filter(s => s.target == SkillTarget.mine).map(s => {
+      skills.push({chara: chara, by: chara, skill: s});
+    });
+
+    // 条件にあうか
+    skills = skills.filter(s => {
+      // 特殊条件の場合
+      if (s.rate) { return s.rate(s.chara, s.by, s.skill);}
+
+      // 距離が条件の場合
+      return s.chara.pos.abs(s.by.pos) <= s.skill.target_range;
+    });
+
+    // ステータス対象を絞る
+    skills = skills.filter(s => s.skill.status.includes(status));
+
+    return skills;
   },
 });
 

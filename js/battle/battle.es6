@@ -73,10 +73,10 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
     new BattlePhase(BattleTaskType.player, player, enemy);
     new BattlePhase(BattleTaskType.enemy, enemy, player);
 
-    if (player.isMoreAttack(enemy)) {
+    if (player.isMoreAttack(scenes.map, enemy)) {
       new BattlePhase(BattleTaskType.player, player, enemy);
     }
-    if (enemy.isMoreAttack(player)) {
+    if (enemy.isMoreAttack(scenes.map, player)) {
       new BattlePhase(BattleTaskType.enemy, enemy, player);
     }
 
@@ -192,9 +192,9 @@ var BattleAttack = function(chara, enemy, chara_start_exec = []) {
   this.chara_next_exec = [];
 
   // 命中判定
-  let hit = chara.getHit(enemy);
+  let hit = chara.getHit(scenes.map, enemy);
   this.is_hit = random(100) <= hit;
-  this.damage = chara.getPower(enemy);
+  this.damage = chara.getPower(scenes.map, enemy);
   this.self_damage = 0;
 
   // スキル判定
@@ -203,10 +203,10 @@ var BattleAttack = function(chara, enemy, chara_start_exec = []) {
   }).filter(s => { s.rate(this);});
 
   // クリティカル判定
-  let cri = chara.getCri(enemy);
+  let cri = chara.getCri(scenes.map, enemy);
   this.is_critical = random(100) <= cri;
   if (this.is_critical) {
-    this.damage = this.damage + chara.getPower();
+    this.damage = this.damage + chara.getPower(scenes.map);
   }
 
   // 吸収行為があった場合はダメージ分回復させる
@@ -268,9 +268,9 @@ var BattleStatusWindow = enchant.Class.create(enchant.Group, {
     // 表示パラメータ
     let param_strs = ["威力", "命中", "必殺"];
     let params = [
-      chara.getPower(enemy),
-      chara.getHit(enemy),
-      chara.getCri(enemy)
+      chara.getPower(scenes.map, enemy),
+      chara.getHit(scenes.map, enemy),
+      chara.getCri(scenes.map, enemy)
     ];
 
     param_strs.forEach((param_str, i) => {
@@ -282,7 +282,7 @@ var BattleStatusWindow = enchant.Class.create(enchant.Group, {
 
       var num_str = "";
 
-      if (param_str == "威力" && chara.isMoreAttack(enemy)) {
+      if (param_str == "威力" && chara.isMoreAttack(scenes.map, enemy)) {
         num_str = "yellow";
       }
 

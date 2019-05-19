@@ -195,7 +195,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     // マップスキル
     if (this.isMap()) {
       let skills = this.map.getFloorSkill(this, Status.hit);
-      skills.forEach(s => {hit += s.exec();})
+      skills.forEach(s => {hit += s.skill.exec(s.chara, s.by);});
     }
 
     if (enemy) { hit -= (enemy.getAvo(map, this));}
@@ -205,7 +205,15 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   },
 
   getAvo: function(map = false, enemy = null) {
-    return this.getSpd(map, enemy) * 2 + this.getLuk(map, enemy);
+    var avo = this.getSpd(map, enemy) * 2 + this.getLuk(map, enemy);
+
+    // マップスキル
+    if (this.isMap()) {
+      let skills = this.map.getFloorSkill(this, Status.avo);
+      skills.forEach(s => {avo += s.skill.exec(s.chara, s.by);});
+    }
+
+    return avo;
   },
 
   getCri: function(map = false, enemy = null) {
@@ -324,9 +332,9 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
   // 期待値を取得する
   getExpected: function(chara) {
-    let power = this.getPower(chara);
-    let hit = this.getHit(chara);
-    let cri = this.getCri(chara);
+    let power = this.getPower(this.map, chara);
+    let hit = this.getHit(this.map, chara);
+    let cri = this.getCri(this.map, chara);
     let cri_power = power + this.getPower();
 
     var expected = hit * cri * cri_power;
