@@ -213,7 +213,6 @@ var BattleChara = enchant.Class.create(enchant.Group, {
     //攻撃終了か
     this.sprite.tl.cue(this.cue).then(() => {
       // 相手のダメージモーションを元に戻す
-      console.log('setInit', this.enemy);
       if (this.enemy) { this.enemy.battle.setInit(); }
     }).delay(10).then(() => {
       this.frame(0);
@@ -328,9 +327,29 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   },
 
   /**
-   * ## setCharaStartSkill
-   * 攻撃開始前に発動するスキル 
+   * ## setCharaSkill
+   * 攻撃時に発動するスキル 
    * @param attack
+   * @param frame 
+   */
+  setCharaSkill: function(attack, frame) {
+    if (!attack || attack.chara_exec.length == 0) {return frame;}
+
+    // スキル発動エフェクト
+    frame = this.showSkillExecEffect(attack.chara_exec, attack.chara.battle, frame);
+
+    // スキルの起動
+    attack.chara_exec.forEach((s, i) => {
+      // 実行関数があれば実行
+      if (s.exec) { frame = s.exec(this, frame);};
+    });
+
+    return frame + 10;
+  },
+
+  /**
+   * 攻撃開始前に発動するスキル
+   * @param attack 
    * @param frame 
    */
   setCharaStartSkill: function(attack, frame) {
@@ -338,13 +357,6 @@ var BattleChara = enchant.Class.create(enchant.Group, {
 
     // スキル発動エフェクト
     frame = this.showSkillExecEffect(attack.chara_start_exec, attack.chara.battle, frame);
-
-    // スキルの起動
-    attack.chara_start_exec.forEach((s, i) => {
-      // 実行関数があれば実行
-      if (s.exec) { frame = s.exec(this, frame);};
-    });
-
     return frame + 10;
   },
 
@@ -358,8 +370,6 @@ var BattleChara = enchant.Class.create(enchant.Group, {
   setEnemySkill: function(attack, frame) {
     if (!attack || attack.enemy_exec.length == 0) {return frame;}
 
-    console.log('before', frame);
-
     // スキル発動エフェクト
     frame = this.showSkillExecEffect(attack.enemy_exec, attack.enemy.battle, frame);
 
@@ -368,8 +378,6 @@ var BattleChara = enchant.Class.create(enchant.Group, {
       // 実行関数があれば実行
       if (s.exec) { frame = s.exec(attack, frame);};
     });
-
-    console.log('after', frame);
 
     return frame + 10; 
   },

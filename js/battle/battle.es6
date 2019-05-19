@@ -70,17 +70,17 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
 
     // バトル実行の流れ
     this.cue = [];
-    this.cue.push(new BattlePhase(BattleTaskType.player, player, enemy));
-    this.cue.push(new BattlePhase(BattleTaskType.enemy, enemy, player));
+    new BattlePhase(BattleTaskType.player, player, enemy);
+    new BattlePhase(BattleTaskType.enemy, enemy, player);
 
     if (player.isMoreAttack(enemy)) {
-      this.cue.push(new BattlePhase(BattleTaskType.player, player, enemy));
+      new BattlePhase(BattleTaskType.player, player, enemy);
     }
     if (enemy.isMoreAttack(player)) {
-      this.cue.push(new BattlePhase(BattleTaskType.enemy, enemy, player));
+      new BattlePhase(BattleTaskType.enemy, enemy, player);
     }
 
-    this.cue.push(new BattlePhase(BattleTaskType.finish));
+    new BattlePhase(BattleTaskType.finish);
 
     // タスク実行
     var i = 0;
@@ -148,19 +148,24 @@ var BattlePhase = function(type, player = null, enemy = null, beforeAttack = nul
   this.type = type;
   this.player = player;
   this.enemy = enemy;
+  scenes.battle.cue.push(this);
 
   this.isFinish = () => {
     return type == BattleTaskType.finish;
   };
 
   if (type == BattleTaskType.finish) { return; }
-  this.attack = new BattleAttack(player, enemy);
+
+  // 攻撃判定
+  // 連続攻撃など前回から持ち越すスキルがある場合はセットする
+  var chara_start_exec = beforeAttack ? beforeAttack.chara_next_exec : [];
+  this.attack = new BattleAttack(player, enemy, chara_start_exec);
 
   // 連続攻撃処理
-  if (this.attack.is_rengeki) {
+  if (this.attack.chara_next_exec.length > 0) {
     // すでに発動済みの場合は処理しない
-    if (beforeAttack && beforeAttack.is_rengeki) { return;}
-    scenes.battle.cue.push(new BattlePhase(type, player, enemy, this.attack));
+    if (beforeAttack && beforeAttack.chara_next_exec.length > 0) {return;}
+    new BattlePhase(type, player, enemy, this.attack);
   }
 };
 
@@ -169,18 +174,20 @@ var BattlePhase = function(type, player = null, enemy = null, beforeAttack = nul
 // is_hit 命中
 // damage 威力
 /////////////////////////
-var BattleAttack = function(chara, enemy) {
+var BattleAttack = function(chara, enemy, chara_start_exec = []) {
   this.chara = chara;
   this.enemy = enemy;
 
   this.is_regist = false;
-  this.is_rengeki = false;
 
   // 発動したスキル
-  this.chara_start_exec = [];
-  this.chara_end_exec = [];
+  this.chara_exec = [];
+  this.chara_start_exec = chara_start_exec;
   this.enemy_exec = [];
   this.enemy_before_damage = [];
+
+  // 連続攻撃などで
+  this.chara_next_exec = [];
 
   // 命中判定
   let hit = chara.getHit(enemy);

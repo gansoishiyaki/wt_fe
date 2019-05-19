@@ -17,12 +17,13 @@ var Hyrein = enchant.Class.create(BattleChara, {
     if (!this.setInitAttack(attack, callback)) { return; }
 
     var frame = 5;
+    frame = this.setCharaStartSkill(attack, frame);
 
     // 構える
     this.cue[frame] = () => { this.frame(1); };
 
     // このタイミングで発動するスキル表示はあるか
-    frame = this.setCharaStartSkill(attack, frame);
+    frame = this.setCharaSkill(attack, frame);
     frame = this.setEnemySkill(attack, frame);
 
     //マントバサバサ && 鳥さん飛ばす
@@ -63,11 +64,16 @@ var Hyrein = enchant.Class.create(BattleChara, {
   },
 
   critical: function(attack, callback) {
+    var frame = 5;
+
+    // 事前スキル発動
+    frame = this.setCharaStartSkill(attack, frame);
+
     // 構える
-    this.cue[5] = () => { this.frame(8);}; 
+    this.cue[frame] = () => { this.frame(8);}; 
+    frame += 3;
 
     // 後ろを向く
-    var frame = 8;
     this.cue[frame] = () => { this.frame(9); };
     frame += 3;
     this.cue[frame] = () => { this.frame(10); };
@@ -80,7 +86,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
     frame += 10;
 
     // このタイミングで発動するスキル表示はあるか
-    frame = this.setCharaStartSkill(attack, frame);
+    frame = this.setCharaSkill(attack, frame);
     frame = this.setEnemySkill(attack, frame);
     frame += 5;
 
@@ -202,7 +208,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
   clear: function() {
     // 魚を削除する
     this.fishs.forEach(fish => {
-      fish.tl.removeFromScene();
+      this.removeChild(fish);
     });
   },
 });

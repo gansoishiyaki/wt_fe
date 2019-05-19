@@ -30,16 +30,16 @@ let SkillData = {
   alektor: {
     id: "alektor",
     name: "キューブ化",
-    description: "技*2%で発動。<br>相手の防御力を半減して攻撃する。",
+    description: "技*3%で発動。<br>相手の防御力を半減して攻撃する。",
     type: SkillExecType.battle,
     target: SkillTarget.enemy,
     rate: function(attack) {
       // 技*2%で発動
-      let teh = attack.chara.getTeh(attack.enemy) * 2;
+      let teh = attack.chara.getTeh(attack.enemy) * 3;
       if (random(100) <= teh) {
         // 相手の防御半分ダメージ加算
         attack.damage += attack.enemy.getDef(this.chara) / 2;
-        this.setExec(attack.chara_start_exec);
+        this.setExec(attack.chara_exec);
       }
     },
   },
@@ -55,7 +55,7 @@ let SkillData = {
       let teh = attack.chara.getTeh(attack.enemy);
       if (random(100) <= teh) {
         attack.is_drain = true;
-        this.setExec(attack.chara_start_exec);
+        this.setExec(attack.chara_exec);
       }
     },
   },
@@ -63,12 +63,12 @@ let SkillData = {
   alektor_guard: {
     id: "fish",
     name: "生物弾ガード",
-    description: "技 / 2%で発動。<br>相手の攻撃を無効化する。",
+    description: "技%で発動。<br>相手の攻撃を無効化する。",
     type: SkillExecType.battle,
     target: SkillTarget.mine,
     rate: function(attack) {
       // 技*1.5%で発動。
-      let teh = attack.enemy.getTeh(attack.chara) / 2;
+      let teh = attack.enemy.getTeh(attack.chara);
 
       // 攻撃を無効化する
       if (random(100) <= teh) {
@@ -92,7 +92,7 @@ let SkillData = {
       // 技%で発動
       let teh = attack.chara.getTeh(attack.enemy);
       if (random(100) <= teh) {
-        attack.is_rengeki;
+        this.setExec(attack.chara_next_exec);
       }
     },
   },
