@@ -35,7 +35,7 @@ let SkillData = {
     target: SkillTarget.enemy,
     rate: function(attack) {
       // 技*2%で発動
-      let teh = attack.chara.getTeh(attack.enemy) * 3;
+      let teh = attack.chara.getTeh(scenes.map, attack.enemy) * 3;
       if (random(100) <= teh) {
         // 相手の防御半分ダメージ加算
         attack.damage += attack.enemy.getDef(this.chara) / 2;
@@ -52,7 +52,7 @@ let SkillData = {
     target: SkillTarget.enemy,
     rate: function(attack) {
       // 技%で発動
-      let teh = attack.chara.getTeh(attack.enemy);
+      let teh = attack.chara.getTeh(scenes.map, attack.enemy);
       if (random(100) <= teh) {
         attack.is_drain = true;
         this.setExec(attack.chara_exec);
@@ -68,7 +68,7 @@ let SkillData = {
     target: SkillTarget.mine,
     rate: function(attack) {
       // 技*1.5%で発動。
-      let teh = attack.enemy.getTeh(attack.chara);
+      let teh = attack.enemy.getTeh(scenes.map, attack.chara);
 
       // 攻撃を無効化する
       if (random(100) <= teh) {
@@ -90,7 +90,7 @@ let SkillData = {
     target: SkillTarget.enemy,
     rate: function(attack) {
       // 技%で発動
-      let teh = attack.chara.getTeh(attack.enemy);
+      let teh = attack.chara.getTeh(scenes.map, attack.enemy);
       if (random(100) <= teh) {
         this.setExec(attack.chara_next_exec);
       }
@@ -102,9 +102,11 @@ let SkillData = {
     name: "侵攻部隊隊長",
     description: "周囲3マス以内の<br>相手の命中・回避率を10%下げる。",
     type: SkillExecType.field,
-    target: SkillTarget.camp,
+    target: SkillTarget.enemy,
+    target_range: 3,
     status: [Status.hit, Status.avo],
-    rate: (chara, taeget) => {
+    exec: () => {
+      return -10;
     },
   },
 }

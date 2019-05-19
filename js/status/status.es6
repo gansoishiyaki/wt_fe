@@ -76,7 +76,7 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     let skill_hit_label = new FLabel("命中", 12, 75, 33);
     skill_hit_label.setShadow();
     trigger.addChild(skill_hit_label);
-    let skill_hit = new FLabel(chara.trigger().atk, 12, 105, 33);
+    let skill_hit = new FLabel(chara.trigger().hit, 12, 105, 33);
     skill_hit.setShadow();
     trigger.addChild(skill_hit);
 

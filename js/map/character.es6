@@ -5,6 +5,7 @@
 
 var MapCharactor = enchant.Class.create(enchant.Group, {
   camp: CampType.party,
+  map: null,
   hp: 0,
   maxhp: 0,
   is_touch: false,
@@ -108,6 +109,14 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     });
   },
 
+  setMap: function(map) {
+    this.map = map;
+  },
+
+  isMap: function() {
+    return this.map != null;
+  },
+
   // ターン開始され、移動可能に
   canMove: function() {
     this.move_flag = false;
@@ -164,59 +173,68 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.y = CHIP_SIZE * p.y;
   },
 
-  isMoreAttack: function(enemy = null) {
-    return (this.getSpd() - enemy.getSpd()) >= 4;
+  isMoreAttack: function(map = false, enemy = null) {
+    return (this.getSpd(map, enemy) - enemy.getSpd(map, this)) >= 4;
   },
 
   // 威力
-  getPower: function(enemy = null) {
-    var power = this.data.atk + this.trigger().atk;
-    if (enemy) { power -= enemy.getDef(this); }
+  getPower: function(map = false, enemy = null) {
+    var power = this.getAtk(map, enemy) + this.trigger().atk;
+    if (enemy) { power -= enemy.getDef(map, this); }
 
     return power;
   },
 
-  getDef: function(enemy = null) {
+  getDef: function(map = false, enemy = null) {
     return this.data.def;
   },
 
-  getHit: function(enemy = null) {
-    var hit = this.getTeh() * 2 + this.getLuk(enemy) / 2 + this.trigger().hit;
-    if (enemy) { hit -= (enemy.getAvo(this));}
-    return Math.floor(hit);
+  getHit: function(map = false, enemy = null) {
+    var hit = this.getTeh(map, enemy) * 2 + this.getLuk(map, enemy) / 2 + this.trigger().hit;
+
+    // マップスキル
+    if (this.isMap()) {
+      let skills = this.map.getFloorSkill(this, Status.hit);
+      skills.forEach(s => {hit += s.exec();})
+    }
+
+    if (enemy) { hit -= (enemy.getAvo(map, this));}
+    hit = Math.floor(hit);
+
+    return hit;
   },
 
-  getAvo: function(enemy = null) {
-    return this.getSpd(enemy) * 2 + this.getLuk(enemy);
+  getAvo: function(map = false, enemy = null) {
+    return this.getSpd(map, enemy) * 2 + this.getLuk(map, enemy);
   },
 
-  getCri: function(enemy = null) {
-    var cri = this.getTeh() / 2 + this.trigger().cri;
-    if (enemy) { cri -= (enemy.getCriAvo(this));}
+  getCri: function(map = false, enemy = null) {
+    var cri = this.getTeh(map, enemy) / 2 + this.trigger().cri;
+    if (enemy) { cri -= (enemy.getCriAvo(map, this));}
     return Math.floor(cri);
   },
 
-  getCriAvo: function(enemy = null) {
-    return this.getLuk(enemy);
+  getCriAvo: function(map = false, enemy = null) {
+    return this.getLuk(map, enemy);
   },
 
-  getAtk: function(enemy = null) {
+  getAtk: function(map = false, enemy = null) {
     return this.data.atk;
   },
 
-  getSpd: function(enemy = null) {
+  getSpd: function(map = false, enemy = null) {
     return this.data.spd;
   },
 
-  getTeh: function(enemy = null) {
+  getTeh: function(map = false, enemy = null) {
     return this.data.teh;
   },
 
-  getLuk: function(enemy = null) {
+  getLuk: function(map = false, enemy = null) {
     return this.data.luk;
   },
 
-  getMove: function() {
+  getMove: function(map = false, enemy = null) {
     return this.data.move;
   },
 

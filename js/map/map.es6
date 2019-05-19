@@ -53,6 +53,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       var chara = new MapCharactor(enemy.chara, CampType.enemy);
       // 位置
       chara.setPos(new Pos(enemy.x, enemy.y));
+      chara.setMap(this);
 
       // 思考ルーチン
       chara.routine = enemy.routine;
@@ -67,6 +68,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       
       var chara = new MapCharactor(party[i]);
       chara.setPos(new Pos(player.x, player.y));
+      chara.setMap(this);
       this.field.addChild(chara);
       this.charas.push(chara);
     });
@@ -721,6 +723,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
    */
   otherCampCharas: function(camp) {
     return this.charas.filter(c => c.camp != camp);
+  },
+
+  /**
+   * ## getFloorSkill 
+   * フロア影響のスキルを取得する
+   * @param chara 
+   * @param status
+   */
+  getFloorSkill: function(chara, status) {
+    var skills = []; // {chara, enemy, skillの配列}
+    
+
+
+    return skills.map(s => s.skill);
   },
 });
 

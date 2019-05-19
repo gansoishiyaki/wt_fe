@@ -148,6 +148,8 @@ var BattlePhase = function(type, player = null, enemy = null, beforeAttack = nul
   this.type = type;
   this.player = player;
   this.enemy = enemy;
+
+  // タスクに追加する
   scenes.battle.cue.push(this);
 
   this.isFinish = () => {
