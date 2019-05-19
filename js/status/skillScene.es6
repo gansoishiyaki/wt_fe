@@ -19,11 +19,15 @@ var SkillScene = enchant.Class.create(enchant.Scene, {
     this.on(Event.TOUCH_END, e => {
       // ウィンドウ削除
       game.popScene(this);
+
+      // コールバックをよぶ
+      if(this.callback){this.callback();}
     });
   },
 
-  setSkill: function(skill) {
+  setSkill: function(skill, callback = null) {
     this.main.removeAll();
+    this.callback = callback;
 
     // ウィンドウ
     this.window = new GradSquare(this.size.width, this.size.height, COLOR.window.player);

@@ -816,12 +816,12 @@ var MiniStatus = enchant.Class.create(enchant.Group, {
     // スキル表示
     this.skillGroup = new Group();
     this.skillGroup.x = 55;
-    this.skillGroup.y = status_y + 15;
+    this.skillGroup.y = status_y + 18;
     this.addChild(this.skillGroup);
 
     chara.skills.forEach((s, i) => {
       let sImage = s.image();
-      sImage.x = i * 25;
+      sImage.x = i * 30 + 5;
       this.skillGroup.addChild(sImage);
 
       // タッチしたらスキル説明文
@@ -829,11 +829,5 @@ var MiniStatus = enchant.Class.create(enchant.Group, {
         scenes.skill.setSkill(s);
       });
     });
-
-    // スキル説明
-    /*
-    this.description = new FLabel(chara.data.main_trigger.description, 10, 60, status_y + 20);
-    this.addChild(this.description);
-    */
   },
 });

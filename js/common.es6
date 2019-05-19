@@ -66,8 +66,11 @@ let Status = {
   spd: "機動",
   teh: "技術",
   luk: "運",
+  pow: "威力",
   hit: "命中",
   avo: "回避",
+  cri: "必殺",
+  criAvo: "必回"
  };
 
 let FPS = 25;

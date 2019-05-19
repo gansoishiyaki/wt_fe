@@ -1,6 +1,6 @@
 var StatusScene = enchant.Class.create(enchant.Scene, {
   margin: 10,
-
+  skill_flag: false,
   initialize: function() {
     enchant.Scene.call(this);
 
@@ -12,10 +12,11 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     // window表示
     this.main = new Group();
     this.main.x = this.margin;
-    this.main.y = this.margin * 8;
+    this.main.y = this.margin * 4;
     this.addChild(this.main);
 
     this.on(Event.TOUCH_END, e => {
+      if(this.skill_flag) {return;}
       // ウィンドウ削除
       game.popScene(this);
     });
@@ -26,7 +27,7 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
 
     // ウィンドウ
     let window_width = WINDOW.width - this.margin * 2;
-    let window_height = WINDOW.height - this.margin * 16;
+    let window_height = WINDOW.height - this.margin * 8;
     this.window = new GradSquare(window_width, window_height, COLOR.window.player);
     this.main.addChild(this.window);
 
@@ -48,19 +49,44 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     this.main.addChild(this.role_text);
 
     // トリガー
-    this.trigger = new Group();
-    this.trigger.x = this.margin;
-    this.trigger.y = 70;
-    this.main.addChild(this.trigger);
+    let trigger = new Group();
+    trigger.x = this.margin;
+    trigger.y = 70;
+    this.main.addChild(trigger);
+
+    // トリガーウィンドウ
+    let trigger_window = new FSprite({width: 203, height: 51});
+    trigger_window.setImage('img/system/trigger_window.png');
+    trigger.addChild(trigger_window);
 
     // トリガー名
-    this.skill_text = new FLabel(chara.trigger().name, 11, 0, 0);
-    this.skill_text.setShadow();
-    this.trigger.addChild(this.skill_text);
+    let skill_text = new FLabel(chara.trigger().name, 11, 10, 15);
+    skill_text.setShadow();
+    trigger.addChild(skill_text);
 
-    // トリガー説明
-    this.description = new FLabel(chara.trigger().description, 10, 3, 18);
-    this.trigger.addChild(this.description);
+    // トリガー威力
+    let skill_power_label = new FLabel("威力", 12, 15, 33);
+    skill_power_label.setShadow();
+    trigger.addChild(skill_power_label);
+    let skill_power = new FLabel(chara.trigger().atk, 12, 45, 33);
+    skill_power.setShadow();
+    trigger.addChild(skill_power);
+
+    // トリガー命中
+    let skill_hit_label = new FLabel("命中", 12, 75, 33);
+    skill_hit_label.setShadow();
+    trigger.addChild(skill_hit_label);
+    let skill_hit = new FLabel(chara.trigger().atk, 12, 105, 33);
+    skill_hit.setShadow();
+    trigger.addChild(skill_hit);
+
+    // トリガークリティカル
+    let skill_cri_label = new FLabel("必殺", 12, 135, 33);
+    skill_cri_label.setShadow();
+    trigger.addChild(skill_cri_label);
+    let skill_cri = new FLabel(`${chara.trigger().cri}`, 12, 165, 33);
+    skill_cri.setShadow();
+    trigger.addChild(skill_cri);
 
     // ステータス
     this.status = new Group();
@@ -68,12 +94,29 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     this.status.y = 130;
     this.main.addChild(this.status);
 
-    Object.keys(Status).forEach((key, i) => {
-      if (i > 5) {return;}
+    let values = [
+      chara.maxhp,
+      chara.getAtk(),
+      chara.getDef(),
+      chara.getSpd(),
+      chara.getTeh(),
+      chara.getLuk(),
+      chara.getPower(),
+      chara.getHit(),
+      chara.getAvo(),
+      chara.getCri(),
+      chara.getCriAvo()
+    ]
 
+    Object.keys(Status).forEach((key, i) => {
       // ステータスラベル
-      var height = i * 25;
-      var status_label = new FLabel(Status[key], 12, 0, height);
+      var y = i * 20;
+      var x = 0;
+      if (i > 5) {
+         y = (i - 6) * 20;
+         x = 100;
+      }
+      var status_label = new FLabel(Status[key], 12, x, y);
       status_label.setShadow();
       this.status.addChild(status_label);
 
@@ -83,27 +126,43 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
       var gage_str = "gagewhite";
       var num_str = "";
       if (key == 'maxhp') { max = 80; }
-
-      // ステータスゲージ
-      var margin_left = 60;
-      var gage_base_width = window_width - margin_left - 25;
-      var gage_width = chara.data[key] / max * gage_base_width;
-      if (gage_width >= gage_base_width) { 
-        // max値より高い場合はゲージをmaxに納めて、色を黄色にする
-        gage_width = gage_base_width;
-        gage_str = "gageyellow";
+      if (i > 5) { max = 150;}
+      if (values[i] >= max) { 
+        // max値より高い場合は色を黄色にする
         num_str = "yellow";
       }
 
-      var gage_base = new Gage("gagebase", margin_left, height + 3, gage_base_width, FILESIZE.gage);
-      var gage = new Gage(gage_str, margin_left, height + 3, gage_width, FILESIZE.gage);
-      this.status.addChild(gage_base);
-      this.status.addChild(gage);
-
       // ステータス
-      var number = new CustomNumbers(chara.data[key], 55, height - 1, num_str);
+      var number = new CustomNumbers(values[i], x + 55, y - 1, num_str);
       number.alignRight();
       this.status.addChild(number);
+    });
+
+    let skills = new Group();
+    skills.x = 15;
+    skills.y = 285;
+    this.addChild(skills);
+
+    chara.skills.forEach((s, i) => {
+      let skill = new Group();
+      skill.y = i * 20;
+      skills.addChild(skill);
+
+      // スキル画像
+      let img = s.image();
+      img.scale(0.6, 0.6);
+      skill.addChild(img);
+
+      let str = new FLabel(s.name, 11, 32, 10);
+      skill.addChild(str);
+
+      // タッチしたらスキル説明文
+      skill.on(Event.TOUCH_END, e => {
+        this.skill_flag = true;
+        scenes.skill.setSkill(s, () => {
+          this.skill_flag = false;
+        });
+      });
     });
 
     // シーン表示

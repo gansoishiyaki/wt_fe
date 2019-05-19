@@ -47,6 +47,7 @@ window.onload = () => {
       'img/system/player_turn_bar.png',
       'img/system/enemy_turn_bar.png',
       'img/battle/skill.png',
+      'img/system/trigger_window.png',
     )
 
     // party

@@ -22,8 +22,6 @@ var Skill = function(skill) {
   this.image = function() {
     let image = new FSprite({width: 30, height: 30});
     image.setImage(`img/system/skill/${this.id}.png`); 
-    image.scaleX = 0.75;
-    image.scaleY = 0.75;
     return image;
   };
 }

@@ -182,22 +182,26 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
   getHit: function(enemy = null) {
     var hit = this.getTeh() * 2 + this.getLuk(enemy) / 2 + this.trigger().hit;
-    if (enemy) { hit -= (enemy.getAbo(this));}
+    if (enemy) { hit -= (enemy.getAvo(this));}
     return Math.floor(hit);
   },
 
-  getAbo: function(enemy = null) {
+  getAvo: function(enemy = null) {
     return this.getSpd(enemy) * 2 + this.getLuk(enemy);
   },
 
   getCri: function(enemy = null) {
     var cri = this.getTeh() / 2 + this.trigger().cri;
-    if (enemy) { cri -= (enemy.getCriAbo(this));}
+    if (enemy) { cri -= (enemy.getCriAvo(this));}
     return Math.floor(cri);
   },
 
-  getCriAbo: function(enemy = null) {
+  getCriAvo: function(enemy = null) {
     return this.getLuk(enemy);
+  },
+
+  getAtk: function(enemy = null) {
+    return this.data.atk;
   },
 
   getSpd: function(enemy = null) {
