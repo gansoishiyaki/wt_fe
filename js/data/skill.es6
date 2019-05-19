@@ -109,4 +109,51 @@ let SkillData = {
       return -10;
     },
   },
+
+  independent: {
+    id: "independent",
+    name: "独断専行",
+    description: "周囲２マス以内に味方がいない場合<br>自分の命中・回避率を10%上げる。",
+    type: SkillExecType.field,
+    target: SkillTarget.mine,
+    status: [Status.hit, Status.avo],
+    rate: (chara, by, skill) => {
+      let charas = scenes.map.getFriendByChara(chara);
+      return charas.filter(c => {return c.pos.abs(chara) <= 2;}).length == 0;
+    },
+    exec: (chara, by) => {
+      return 10;
+    },
+  },
+
+  orderViolation: {
+    id: "enedora",
+    name: "命令違反",
+    description: "周囲２マス以内に味方がいる場合<br>自分の命中・回避率を10%下がる。",
+    type: SkillExecType.field,
+    target: SkillTarget.mine,
+    status: [Status.hit, Status.avo],
+    rate: (chara, by, skill) => {
+      let charas = scenes.map.getFriendByChara(chara);
+      return charas.filter(c => {return c.pos.abs(chara) <= 2;}).length > 0;
+    },
+    exec: (chara, by) => {
+      return -10;
+    },
+  },
+
+  bolboros: {
+    id: "bolboros",
+    name: "ボルボロス・液体化",
+    description: "回避率を50%アップする",
+    type: SkillExecType.allways,
+    target: SkillTarget.mine,
+    status: [Status.avo],
+    rate: () => {
+      return true;
+    },
+    exec: (chara, by) => {
+      return 50;
+    },
+  },
 }

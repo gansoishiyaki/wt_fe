@@ -24,6 +24,7 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
 
   setChara: function(chara) {
     this.chara = chara;
+    this.main.removeAll();
 
     // ウィンドウ
     let window_width = WINDOW.width - this.margin * 2;
@@ -139,9 +140,9 @@ var StatusScene = enchant.Class.create(enchant.Scene, {
     });
 
     let skills = new Group();
-    skills.x = 15;
-    skills.y = 285;
-    this.addChild(skills);
+    skills.x = 5;
+    skills.y = 245;
+    this.main.addChild(skills);
 
     chara.skills.forEach((s, i) => {
       let skill = new Group();

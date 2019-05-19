@@ -17,13 +17,33 @@ let Chara = {
       SkillData.alektor, 
       SkillData.alektor_drain, 
       SkillData.alektor_guard, 
-      SkillData.rengeki, 
       SkillData.load
     ],
     images: {
       bard: "img/battle/bard.png",
       fish: "img/battle/fish.png"
     }
+  },
+  enedora: {
+    id: "enedora",
+    name: "エネドラ",
+    role: "ハイレイン隊",
+    type: 1,
+    maxhp: 75,
+    atk: 25,
+    def: 26,
+    teh: 27,
+    spd: 25,
+    luk: 5,
+    move: 2,
+    neighbor: true,
+    main_trigger: Trigger.bolboros,
+    skills: [
+      SkillData.bolboros,
+      SkillData.orderViolation,
+      SkillData.independent,
+    ],
+    images: {},
   },
   hyuse: {
     id: "hyuse",

@@ -15,7 +15,19 @@ let Trigger = {
     is_black: true,
     description: "与えたダメージを吸収する。<br>※ハイレイン専用",
     range: 2,
-    type: TriggerRangeType.normal
+    type: TriggerRangeType.normal,
+  },
+  bolboros: {
+    id: "bolboros",
+    name: "【泥の王(ボルボロス)】",
+    pre_name: "泥の王",
+    atk: 10,
+    rank: "s",
+    hit: 80,
+    cri: 30,
+    is_black: true,
+    range: 2,
+    type: TriggerRangeType.normal,
   },
   lambillis: {
     id: "lambillis",

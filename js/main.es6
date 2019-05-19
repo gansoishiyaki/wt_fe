@@ -1,4 +1,4 @@
-let party = [Chara.hyrein];
+let party = [Chara.enedora];
 
 enchant();
 window.onload = () => {

@@ -207,6 +207,13 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   getAvo: function(map = false, enemy = null) {
     var avo = this.getSpd(map, enemy) * 2 + this.getLuk(map, enemy);
 
+    // allのスキル
+    this.skills.filter(s => {
+      return s.type == SkillExecType.allways && s.target == SkillTarget.mine && s.status.includes(Status.avo);
+    }).forEach(s => {
+      avo += s.exec();
+    });
+
     // マップスキル
     if (this.isMap()) {
       let skills = this.map.getFloorSkill(this, Status.avo);
@@ -219,6 +226,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
   getCri: function(map = false, enemy = null) {
     var cri = this.getTeh(map, enemy) / 2 + this.trigger().cri;
     if (enemy) { cri -= (enemy.getCriAvo(map, this));}
+
     return Math.floor(cri);
   },
 
