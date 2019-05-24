@@ -199,7 +199,12 @@ var BattleAttack = function(chara, enemy, chara_start_exec = []) {
 
   // スキル判定
   chara.skills.filter(s => {
-    return s.type == SkillExecType.battle;
+    return s.type == SkillExecType.battle && s.target == SkillTarget.enemy;
+  }).filter(s => { s.rate(this);});
+
+  // スキル判定
+  enemy.skills.filter(s => {
+    return s.type == SkillExecType.battle && s.target == SkillTarget.mine;
   }).filter(s => { s.rate(this);});
 
   // クリティカル判定

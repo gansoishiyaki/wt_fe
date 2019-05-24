@@ -113,7 +113,7 @@ let SkillData = {
   independent: {
     id: "independent",
     name: "独断専行",
-    description: "周囲２マス以内に味方がいない場合<br>自分の命中・回避率を10%上げる。",
+    description: "周囲２マス以内に味方がいない場合<br>自身の命中・回避率を10%上げる。",
     type: SkillExecType.field,
     target: SkillTarget.mine,
     status: [Status.hit, Status.avo],
@@ -129,7 +129,7 @@ let SkillData = {
   orderViolation: {
     id: "enedora",
     name: "命令違反",
-    description: "周囲２マス以内に味方がいる場合<br>自分の命中・回避率を10%下がる。",
+    description: "周囲２マス以内に味方がいる場合<br>自身の命中・回避率が10%下がる。",
     type: SkillExecType.field,
     target: SkillTarget.mine,
     status: [Status.hit, Status.avo],
@@ -142,10 +142,10 @@ let SkillData = {
     },
   },
 
-  bolboros: {
-    id: "bolboros",
+  borboros: {
+    id: "borboros",
     name: "ボルボロス・液体化",
-    description: "回避率を50%アップする",
+    description: "自身の回避率を50%アップさせる",
     type: SkillExecType.allways,
     target: SkillTarget.mine,
     status: [Status.avo],

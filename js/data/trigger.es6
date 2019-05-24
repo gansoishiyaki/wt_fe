@@ -17,7 +17,7 @@ let Trigger = {
     range: 2,
     type: TriggerRangeType.normal,
   },
-  bolboros: {
+  borboros: {
     id: "bolboros",
     name: "【泥の王(ボルボロス)】",
     pre_name: "泥の王",

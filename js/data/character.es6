@@ -37,9 +37,9 @@ let Chara = {
     luk: 5,
     move: 2,
     neighbor: true,
-    main_trigger: Trigger.bolboros,
+    main_trigger: Trigger.borboros,
     skills: [
-      SkillData.bolboros,
+      SkillData.borboros,
       SkillData.orderViolation,
       SkillData.independent,
     ],
@@ -60,7 +60,9 @@ let Chara = {
     neighbor: true,
     main_trigger: Trigger.lambillis,
     skills: [],
-    images: {}
+    images: {
+      brade: 'img/battle/borboros_brade.png'
+    }
   }, 
 }
 
