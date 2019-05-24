@@ -70,14 +70,20 @@ var BattleChara = enchant.Class.create(enchant.Group, {
    * 左右反転した相手の座標を取得する
    * @return {Pos} 座標
    */
-  getEnemyPos: function() {
+  getEnemyCenterPos: function() {
     let pos = this.enemy.battle.sprite.getCenterPos();
     pos.x = WINDOW.width - pos.x;
     return pos;
   },
 
+  getEnemyPos: function() {
+    let pos = this.enemy.battle.sprite.getPos();
+    pos.x = WINDOW.width - pos.x - this.enemy.battle.sprite.size.width;
+    return pos;
+  },
+
   attack: function(attack, func) {},
-  critical: function(attack, func) { attack(func);},
+  critical: function(attack, func) { this.attack(attack, func);},
 
   /**
    * ## attack
@@ -396,5 +402,9 @@ var BattleCharaSprite = enchant.Class.create(enchant.Group, {
 
   getCenterPos: function() {
     return new Pos(this.x + this.size.width / 2, this.y + this.size.height / 2);
+  },
+
+  getPos: function() {
+    return new Pos(this.x, this.y);
   },
 });

@@ -78,7 +78,7 @@ let SkillData = {
     },
     exec: (attack, frame) => {
       // 生物弾を表示
-      return attack.chara.battle.fish(attack, frame);
+      return attack.enemy.battle.fish(attack, frame);
     },
   },
 

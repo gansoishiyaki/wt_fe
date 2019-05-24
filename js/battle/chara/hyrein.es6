@@ -146,7 +146,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
   },
 
   moveBard: function(time = 15, rand = false) {
-    var target = this.getEnemyPos();
+    var target = this.getEnemyCenterPos();
     target.x = rand ? -300 : -30;
 
     this.bards.forEach(bard => {
@@ -160,7 +160,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
   },
 
   fish: function(attack, frame) {
-    this.cue[frame] = () => { attack.enemy.battle._fish(); };
+    attack.chara.battle.cue[frame] = () => { attack.enemy.battle._fish(); };
 
     return frame;
   },
@@ -207,8 +207,8 @@ var Hyrein = enchant.Class.create(BattleChara, {
 
   clear: function() {
     // 魚を削除する
-    this.fishs.forEach(fish => {
-      this.removeChild(fish);
+    this.fishs.forEach(e => {
+      this.removeChild(e);
     });
   },
 });

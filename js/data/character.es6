@@ -43,7 +43,9 @@ let Chara = {
       SkillData.orderViolation,
       SkillData.independent,
     ],
-    images: {},
+    images: {
+      brade: 'img/battle/borboros_brade_self.png'
+    }
   },
   hyuse: {
     id: "hyuse",
@@ -61,7 +63,6 @@ let Chara = {
     main_trigger: Trigger.lambillis,
     skills: [],
     images: {
-      brade: 'img/battle/borboros_brade.png'
     }
   }, 
 }
