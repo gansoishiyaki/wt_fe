@@ -740,7 +740,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
    * @param chara 
    */
   getFriendByChara: function(chara) {
-    return this.sameCampCharas(chara.camp);
+    return this.sameCampCharas(chara.camp).filter(c => c != chara);
   },
 
   /**
@@ -772,10 +772,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       skills.push({chara: chara, by: chara, skill: s});
     });
 
+    // フィールド限定にする
+    skills = skills.filter(s => s.skill.type == SkillExecType.field);
+
     // 条件にあうか
     skills = skills.filter(s => {
       // 特殊条件の場合
-      if (s.rate) { return s.rate(s.chara, s.by, s.skill);}
+      if (s.skill.rate) { return s.skill.rate(s.chara, s.by, s.skill);}
 
       // 距離が条件の場合
       return s.chara.pos.abs(s.by.pos) <= s.skill.target_range;

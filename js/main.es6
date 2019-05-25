@@ -12,7 +12,7 @@ window.onload = () => {
   game.onload = () => {
     // map表示
     scenes.changeTurn = new TurnChangeScene();
-    scenes.map = new MapScene(Maps.test);
+    scenes.map = new MapScene(Maps.enehy);
     scenes.status = new StatusScene();
     scenes.preBattle = new PreBattleScene();
     scenes.battle = new BattleScene();

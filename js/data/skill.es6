@@ -119,7 +119,7 @@ let SkillData = {
     status: [Status.hit, Status.avo],
     rate: (chara, by, skill) => {
       let charas = scenes.map.getFriendByChara(chara);
-      return charas.filter(c => {return c.pos.abs(chara) <= 2;}).length == 0;
+      return charas.filter(c => {return c.pos.abs(chara.pos) <= 2;}).length == 0;
     },
     exec: (chara, by) => {
       return 10;
@@ -135,7 +135,7 @@ let SkillData = {
     status: [Status.hit, Status.avo],
     rate: (chara, by, skill) => {
       let charas = scenes.map.getFriendByChara(chara);
-      return charas.filter(c => {return c.pos.abs(chara) <= 2;}).length > 0;
+      return charas.filter(c => {return c.pos.abs(chara.pos) <= 2;}).length > 0;
     },
     exec: (chara, by) => {
       return -10;
