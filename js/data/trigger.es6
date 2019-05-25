@@ -10,10 +10,9 @@ let Trigger = {
     pre_name: "卵の冠",
     atk: 12,
     rank: "s",
-    hit: 70,
+    hit: 80,
     cri: 0,
     is_black: true,
-    description: "与えたダメージを吸収する。<br>※ハイレイン専用",
     range: 2,
     type: TriggerRangeType.normal,
   },
@@ -38,7 +37,6 @@ let Trigger = {
     hit: 80,
     cri: 0,
     is_black: false,
-    description: "攻撃後、敵を自分の隣に隣接させる。<br>※ヒュース専用",
     range: 2,
     type: TriggerRangeType.normal
   }

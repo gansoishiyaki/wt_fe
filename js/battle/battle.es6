@@ -123,9 +123,9 @@ var BattleScene = enchant.Class.create(enchant.Scene, {
   // キャラクターごとのアニメーションクラスを呼び出す
   setAnimation: function(player, enemy) {
     switch (player.data.id){
-      case Chara.hyrein.id:
+      case CharaData.hyrein.id:
         return new Hyrein(player, enemy);
-      case Chara.enedora.id:
+      case CharaData.enedora.id:
         return new Enedora(player, enemy);
       default:
         return new Hyrein(player, enemy);

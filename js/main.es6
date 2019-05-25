@@ -12,18 +12,20 @@ window.onload = () => {
   game.onload = () => {
     // map表示
     scenes.changeTurn = new TurnChangeScene();
-    scenes.map = new MapScene(Maps.enehy);
+    //scenes.map = new MapScene(Maps.enehy);
     scenes.status = new StatusScene();
     scenes.preBattle = new PreBattleScene();
     scenes.battle = new BattleScene();
     scenes.battleResult = new BattleResultScene();
     scenes.skill = new SkillScene();
-    
-    game.pushScene(scenes.map);
+    scenes.selectMap = new SelectMap();
+    scenes.selectMap.setScene();
 
+    /*
     scenes.map.tl.delay(10).then(() => {
       scenes.changeTurn.setScene(CampType.party);
     });
+    */
   };
 
   game.start();
@@ -48,10 +50,11 @@ window.onload = () => {
       'img/system/enemy_turn_bar.png',
       'img/battle/skill.png',
       'img/system/trigger_window.png',
+      'img/system/chara_empty.png',
     )
 
     // party
-    userData.party.forEach(chara => {
+    userData.charas.forEach(chara => {
       preload_chara(chara);
     });
 

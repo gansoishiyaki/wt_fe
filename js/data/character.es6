@@ -1,5 +1,21 @@
 var Chara = function(chara) {
+  this.neighbor = false;
   Object.assign(this, chara);
+
+  /**
+   * 顔グラ取得
+   */
+  this.faceImage = function() {
+    let image = new FSprite({width: 50, height: 50});
+    image.setImage(`img/chara/status/${this.id}.png`);
+    return image;
+  };
+
+  this.mapImage = function() {
+    let image = new FSprite({width: 40, height: 40});
+    image.setImage(`img/chara/map/${this.id}.png`);
+    return image;
+  };
 };
 
 let CharaData = {

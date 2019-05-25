@@ -5,7 +5,7 @@ var Enedora = enchant.Class.create(BattleChara, {
   initialize: function(chara, enemy) {
     BattleChara.call(this, chara, enemy);
 
-    this.data = Chara.enedora;
+    this.data = new Chara(CharaData.enedora);
     this.size = {width: 60, height: 60};
     this.main(this.size);
   },

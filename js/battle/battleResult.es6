@@ -111,8 +111,6 @@ var BattleResultScene = enchant.Class.create(enchant.Scene, {
       postTwitter(twitter_msg);
     });
 
-    // postTwitter(`負けてしまった・・・`);
-
     game.pushScene(this);
   },
 });

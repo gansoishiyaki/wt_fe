@@ -6,7 +6,7 @@ var Hyrein = enchant.Class.create(BattleChara, {
   initialize: function(chara, enemy) {
     BattleChara.call(this, chara, enemy);
 
-    this.data = Chara.hyrein;
+    this.data = new Chara(CharaData.hyrein);
     this.size = {width: 60, height: 58};
     this.main(this.size);
   },

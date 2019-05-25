@@ -58,7 +58,7 @@ var MapPointData = {
 
 let Maps = {
   enedora: {
-    name: "テストマップ",
+    name: "vs エネドラ",
     chip: MapStatus.test,
     data: MapPointData.test,
     enemies: [{
@@ -73,7 +73,7 @@ let Maps = {
     ],
   },
   hyrein: {
-    name: "テストマップ",
+    name: "vs ハイレイン",
     chip: MapStatus.test,
     data: MapPointData.test,
     enemies: [{
@@ -88,7 +88,7 @@ let Maps = {
     ],
   },
   enehy: {
-    name: "テストマップ",
+    name: "vs エネドラ&ハイレイン",
     chip: MapStatus.test,
     data: MapPointData.test,
     enemies: [{
