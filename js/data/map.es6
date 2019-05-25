@@ -62,7 +62,7 @@ let Maps = {
     chip: MapStatus.test,
     data: MapPointData.test,
     enemies: [{
-      chara: Chara.enedora,
+      chara: new Chara(CharaData.enedora),
       x: 3,
       y: 1,
       routine: RoutineType.none,
@@ -77,7 +77,7 @@ let Maps = {
     chip: MapStatus.test,
     data: MapPointData.test,
     enemies: [{
-      chara: Chara.hyrein,
+      chara: new Chara(CharaData.hyrein),
       x: 3,
       y: 1,
       routine: RoutineType.none,
@@ -92,12 +92,12 @@ let Maps = {
     chip: MapStatus.test,
     data: MapPointData.test,
     enemies: [{
-      chara: Chara.enedora,
+      chara: new Chara(CharaData.enedora),
       x: 4,
       y: 1,
       routine: RoutineType.none,
     },{
-      chara: Chara.hyrein,
+      chara: new Chara(CharaData.hyrein),
       x: 3,
       y: 1,
       routine: RoutineType.none,

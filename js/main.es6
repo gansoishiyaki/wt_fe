@@ -1,4 +1,4 @@
-let party = [Chara.enedora];
+let userData = new UserData();
 
 enchant();
 window.onload = () => {
@@ -51,7 +51,7 @@ window.onload = () => {
     )
 
     // party
-    party.forEach(chara => {
+    userData.party.forEach(chara => {
       preload_chara(chara);
     });
 

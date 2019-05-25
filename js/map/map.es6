@@ -64,9 +64,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
     // 味方の表示
     data.players.forEach((player, i) => {
-      if (party[i] == undefined) {return;}
+      if (userData.party[i] == undefined) {return;}
       
-      var chara = new MapCharactor(party[i]);
+      var chara = new MapCharactor(userData.party[i]);
       chara.setPos(new Pos(player.x, player.y));
       chara.setMap(this);
       this.field.addChild(chara);

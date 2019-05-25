@@ -1,4 +1,8 @@
-let Chara = {
+var Chara = function(chara) {
+  Object.assign(this, chara);
+};
+
+let CharaData = {
   hyrein: {
     id: "hyrein",
     name: "ハイレイン",
