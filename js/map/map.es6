@@ -178,7 +178,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     } else {
       // 範囲内に敵がいない場合は、全キャラクターの優先度をチェックする
       target = enemy.getMostPriority(charas);
-      target_pos = target.pos;
+
+      // 移動範囲内で一番相手に近づける場所を取得する
+      target_pos = this.getTargetPos(enemy.pos, move_max, target.pos, enemy);
     }
 
     var moves = this.calApploach(enemy.pos, target_pos, enemy);
@@ -593,9 +595,9 @@ var MapScene = enchant.Class.create(enchant.Scene, {
 
   /*
    * 移動範囲計算
-   * @param pos 
-   * @param move 
-   * @param chara 
+   * @param pos 出発地点
+   * @param move 移動距離
+   * @param chara 移動するキャラ
    */
   calRange: function(pos, move, chara = null) {
     let moves = this.calRangeMoves(pos, move, chara);
@@ -652,6 +654,22 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       let expected = getExpected(a);
       let result_expected = getExpected(result);
       return expected > result_expected ? a : result;
+    });
+  },
+
+  /**
+   * 指定歩数で一番目標地点に近づける場所を取得する
+   * @param pos 出発地点
+   * @param move 移動距離
+   * @param goal ゴール
+   * @param chara キャラクター
+   */
+  getTargetPos: function(pos, move, goal, chara) {
+    let move_range = this.calRange(pos, move, chara);
+    let moves = this.calRangeMoves(goal, 99, chara, pos);
+
+    return move_range.reduce((p, result) => {
+      return moves[result.x, result.y] > moves[p.x, p.y] ? p : result;
     });
   },
 
