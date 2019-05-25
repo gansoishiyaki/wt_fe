@@ -44,7 +44,8 @@ let Chara = {
       SkillData.independent,
     ],
     images: {
-      brade: 'img/battle/borboros_brade_self.png'
+      brade: 'img/battle/borboros_brade_self.png',
+      brade_enemy: 'img/battle/borboros_brade_enemy.png',
     }
   },
   hyuse: {
