@@ -137,14 +137,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     var enemies = this.sameCampCharas(camp);
 
     // 次のタスクを実行するコールバック
-    var i = 0;
     this.finishEnemyAction = () => {
       // 全員行動終了済みか
-      if (enemies.length <= i) { return; }
+      let yet_move = enemies.filter(e => !e.isMoved());
+      if (yet_move.length == 0) { return; }
 
       // 敵の行動開
-      this.enemyAction(enemies[i]);
-      i++;
+      this.enemyAction(yet_move[0]);
     };
 
     this.finishEnemyAction();
@@ -153,6 +152,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
   enemyAction: function(enemy) {
     switch(enemy.routine) {
       case RoutineType.none:
+      case RoutineType.moveInRange:
       this.enemyActionNormal(enemy);
       break;
     }
@@ -176,6 +176,13 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       let attacks = enemy.calAttackRange([target.pos]);
       target_pos = this.getMostPriority(enemy, target, attacks);
     } else {
+      // 移動タイプがmoveInRangeの場合は何もせず待機
+      if (enemy.routine == RoutineType.moveInRange) {
+        enemy.moved();
+        this.finishEnemyAction();
+        return;
+      }
+
       // 範囲内に敵がいない場合は、全キャラクターの優先度をチェックする
       target = enemy.getMostPriority(charas);
 
@@ -263,8 +270,8 @@ var MapScene = enchant.Class.create(enchant.Scene, {
       break;
       case TurnType.enemy:
         // 全員行動済みか 
-        if (this.enemies().filter(enemy => !enemy.move_flag).length == 0) {
-          this.charas.forEach(c => c.canMove());
+        if (this.enemies().filter(enemy => !enemy.isMoved()).length == 0) {
+          this.charas.forEach(c => c.setFullColor());
           scenes.changeTurn.setScene(CampType.party);
         }
       break;

@@ -23,6 +23,7 @@ let MapStatus = {
 
 let RoutineType = {
   none: 0, // 猪突猛進
+  moveInRange: 1, // 1ターンで攻撃できる範囲だったら攻撃する
 };
 
 var MapPointData = {
@@ -100,7 +101,7 @@ let Maps = {
       chara: new Chara(CharaData.hyrein),
       x: 3,
       y: 1,
-      routine: RoutineType.none,
+      routine: RoutineType.moveInRange,
     },],
     players: [
       {x: 3, y: 5},

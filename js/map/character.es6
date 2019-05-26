@@ -35,6 +35,9 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.addChild(this.gage);
     
     this.touch_start = this.main.on(Event.TOUCH_START, e => {
+      // プレイヤーターン以外は何もできない
+      if (scenes.map.turn != TurnType.player) { return; }
+
       let map = scenes.map;
       this.is_touch = true;
 
@@ -123,6 +126,10 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
     this.main.main.resetGrayImage();
   },
 
+  setFullColor: function() {
+    this.main.main.resetGrayImage();
+  },
+
   // 行動終了
   moved: function() {
     this.move_flag = true;
@@ -130,6 +137,10 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
     // ターン終了チェック
     scenes.map.checkTurn();
+  },
+
+  isMoved: function() {
+    return this.move_flag;
   },
 
   // 本体の画像取得
