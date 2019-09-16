@@ -42,7 +42,10 @@ let CharaData = {
     images: {
       bard: "img/battle/bard.png",
       fish: "img/battle/fish.png"
-    }
+    },
+    supportedTargets: {
+      
+    },
   },
   enedora: {
     id: "enedora",

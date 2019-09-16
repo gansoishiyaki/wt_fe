@@ -676,7 +676,7 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     let moves = this.calRangeMoves(goal, 99, chara, pos);
 
     return move_range.reduce((p, result) => {
-      return moves[result.x, result.y] > moves[p.x, p.y] ? p : result;
+      return moves[result.y][result.x] > moves[p.y][p.x] ? p : result;
     });
   },
 
@@ -775,20 +775,20 @@ var MapScene = enchant.Class.create(enchant.Scene, {
    * @param status
    * @return //[{chara, by, skill}]
    */
-  getFloorSkill: function(chara, status) {
+  getFloorSkill: function(chara, status, pos) {
     var skills = []; // {chara, by, skillの配列}
 
     // 敵のスキル影響 targetがEnemyのスキル
     this.getEnemyByChara(chara).forEach(c => {
       c.skills.filter(s => s.target == SkillTarget.enemy).map(s => {
-        skills.push({chara: chara, by: c, skill: s});
+        skills.push({chara: chara, by: c, skill: s, pos: pos});
       });
     });
 
     // 味方のスキル影響 targetがcampのスキル
     this.getFriendByChara(chara).forEach(c => {
       c.skills.filter(s => s.target == SkillTarget.camp).map(s => {
-        skills.push({chara: chara, by: c, skill: s});
+        skills.push({chara: chara, by: c, skill: s, pos: pos});
       });
     });
 
@@ -803,10 +803,10 @@ var MapScene = enchant.Class.create(enchant.Scene, {
     // 条件にあうか
     skills = skills.filter(s => {
       // 特殊条件の場合
-      if (s.skill.rate) { return s.skill.rate(s.chara, s.by, s.skill);}
+      if (s.skill.rate) { return s.skill.rate(s.chara, s.by, s.skill, s.pos);}
 
       // 距離が条件の場合
-      return s.chara.pos.abs(s.by.pos) <= s.skill.target_range;
+      return s.pos.abs(s.by.pos) <= s.skill.target_range;
     });
 
     // ステータス対象を絞る

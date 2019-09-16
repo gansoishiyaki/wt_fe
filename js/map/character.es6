@@ -205,7 +205,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
     // マップスキル
     if (this.isMap()) {
-      let skills = this.map.getFloorSkill(this, Status.hit);
+      let skills = this.map.getFloorSkill(this, Status.hit, this.pos);
       skills.forEach(s => {hit += s.skill.exec(s.chara, s.by);});
     }
 
@@ -227,7 +227,7 @@ var MapCharactor = enchant.Class.create(enchant.Group, {
 
     // マップスキル
     if (this.isMap()) {
-      let skills = this.map.getFloorSkill(this, Status.avo);
+      let skills = this.map.getFloorSkill(this, Status.avo, this.pos);
       skills.forEach(s => {avo += s.skill.exec(s.chara, s.by);});
     }
 
